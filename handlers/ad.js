@@ -15,4 +15,8 @@ exports.adHandler = [
     body("fuel").notEmpty().withMessage("Fuel is Missing"),
     body("gear").notEmpty().withMessage("Gear is Missing"),
     body("engine").notEmpty().withMessage("Engine is Missing"),
+    body("city").notEmpty().withMessage("City is Missing"),
+    body("make").notEmpty().withMessage("Make is Missing"),
+    body("model").notEmpty().withMessage("Model is Missing"),
+    body("distance").notEmpty().withMessage("Distance is Missing"),
 ];

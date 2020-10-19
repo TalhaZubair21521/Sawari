@@ -20,3 +20,12 @@ exports.ResizeImages = async (path, images) => {
     });
     return files;
 }
+
+
+
+exports.RemoveImages = async (files) => {
+    await files.forEach(async (image) => {
+        const filePath = "assets/" + image.filename;
+        fs.unlinkSync(filePath);
+    });
+}
