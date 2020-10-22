@@ -7,7 +7,6 @@ const UserSchema = new Schema({
     id: Schema.ObjectId,
     email: { type: String, unique: true },
     name: { type: String, required: true, trim: true },
-    phone: { type: String },
     password: { type: String, required: true },
     provider: { type: Object },
     forgetKey: { type: String, required: true },

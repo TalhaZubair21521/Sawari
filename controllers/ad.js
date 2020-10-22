@@ -99,3 +99,16 @@ exports.EditAd = async (req, res) => {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
+
+exports.DeleteAd = async (req, res) => {
+    try {
+        const response = await Ad.findByIdAndDelete(req.query.adId);
+        if (response) {
+            res.status(200).json({ "type": "success", "result": "Ad Deleted Successfully" });
+        } else {
+            res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+        }
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
