@@ -24,7 +24,7 @@ app.use("/user", user.routes);
 app.use("/ad", ad.routes);
 
 app.get("/", function (req, res) {
-    res.sendFile('index.html', { root: path.join(__dirname, '../public') });
+    res.send("Sawari Server");
 });
 
 server = app.listen(port, host, () => {

@@ -17,6 +17,11 @@ exports.Signup = async (req, res) => {
             user.forgetKey = new Date().getTime();
             user.provider = null;
             user.password = await User.ConvertToHash(user.password);
+            const oldUser = await User.findOne({ email: user.email });
+            if (oldUser) {
+                res.status(400).json({ "type": "failure", "result": "Email already Exist. Choose a Different Email" });
+                return;
+            }
             user.save(async (err) => {
                 if (err && err.code === 11000) {
                     const keyName = Object.keys(err.keyValue)[0];
