@@ -5,6 +5,8 @@ const User = require("../models/user");
 
 exports.InsertAd = async (req, res) => {
     try {
+        console.log("Here");
+        console.log(req.body);
         const errors = validationResult(req);
         if (errors.errors.length != 0) {
             await Helper.RemoveImages(req.files);
@@ -23,12 +25,14 @@ exports.InsertAd = async (req, res) => {
                 if (!err) {
                     res.status(200).json({ "type": "success", "result": "Ad Successfully Posted" });
                 } else {
+                    console.log(err);
                     res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 }
             });
         }
     } catch (error) {
         await Helper.RemoveImages(req.files);
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 };

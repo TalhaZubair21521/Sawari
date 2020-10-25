@@ -47,7 +47,7 @@ exports.Signin = async (req, res) => {
             const isEqual = await User.isPasswordEqual(req.query.password, user.password);
             if (isEqual) {
                 const token = await JWT.sign({ username: user.name }, JWT_SECRET_KEY);
-                res.status(200).json({ "type": "success", "result": "User Login Successfully", "token": token });
+                res.status(200).json({ "type": "success", "result": "User Login Successfully", "token": token, "id": user._id });
             } else {
                 res.status(401).json({ "type": "failure", "result": "Wrong Password" });
             }

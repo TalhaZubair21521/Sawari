@@ -9,7 +9,7 @@ const authenticator = require("../middlewares/authenticator");
 
 const router = express.Router();
 
-router.post("/insertAd", adMiddleware.upload.array('images'), authenticator.athenticate, adHandler.adHandler, adControllers.InsertAd);
+router.post("/insertAd", adMiddleware.upload.array('images'), adHandler.adHandler, adControllers.InsertAd);
 router.get("/getAdsByUser", authenticator.athenticate, adControllers.GetAdsByUser);
 router.get("/getAllads", authenticator.athenticate, adControllers.GetAllAds);
 router.get("/getFilteredAds", authenticator.athenticate, adControllers.FilterAds);
