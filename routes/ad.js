@@ -4,12 +4,12 @@ const adHandler = require("../handlers/ad");
 
 const adControllers = require("../controllers/ad");
 
-const adMiddleware = require("../middlewares/adImagesMiddleware");
+const adImagesMiddleware = require("../middlewares/ImagesMiddleware");
 const authenticator = require("../middlewares/authenticator");
 
 const router = express.Router();
 
-router.post("/insertAd", adMiddleware.upload.array('images'), authenticator.athenticate, adHandler.adHandler, adControllers.InsertAd);
+router.post("/insertAd", adImagesMiddleware.upload.array('images'), authenticator.athenticate, adHandler.adHandler, adControllers.InsertAd);
 router.get("/getAdsByUser", adControllers.GetAdsByUser);
 router.get("/getAllads", adControllers.GetAllAds);
 router.get("/getFilteredAds", authenticator.athenticate, adControllers.FilterAds);

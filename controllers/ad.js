@@ -33,7 +33,6 @@ exports.InsertAd = async (req, res) => {
         }
     } catch (error) {
         await Helper.RemoveImages(req.files);
-        console.log("Error : " + error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
     }
 };

@@ -33,7 +33,6 @@ exports.Signup = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 };
