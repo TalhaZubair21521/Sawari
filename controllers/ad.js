@@ -5,8 +5,6 @@ const User = require("../models/user");
 
 exports.InsertAd = async (req, res) => {
     try {
-        console.log("Here");
-        console.log(req.body);
         const errors = validationResult(req);
         if (errors.errors.length != 0) {
             await Helper.RemoveImages(req.files);
@@ -14,10 +12,12 @@ exports.InsertAd = async (req, res) => {
             return;
         } else {
             const ad = new Ad(req.body);
-            const user = User.findById(ad.user);
+            ad.sold = false;
+            const user = await User.findById(ad.user);
             if (!user) {
                 await Helper.RemoveImages(req.files);
                 res.status(401).json({ type: "failure", "result": "No Such User" });
+                return;
             }
             const filesArray = await Helper.ResizeImages(ad._id, req.files);
             ad.images = filesArray;
@@ -25,31 +25,34 @@ exports.InsertAd = async (req, res) => {
                 if (!err) {
                     res.status(200).json({ "type": "success", "result": "Ad Successfully Posted" });
                 } else {
-                    console.log(err);
-                    res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+                    console.log("Error as : " + err);
+                    await Helper.RemoveImages(req.files);
+                    res.status(500).json({ "type": "failure", "result": "Server Not Responding" + err });
                 }
             });
         }
     } catch (error) {
         await Helper.RemoveImages(req.files);
-        console.log(error);
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+        console.log("Error : " + error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
     }
 };
 
 exports.GetAdsByUser = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const ads = await Ad.find({ user: userId }, 'name price images');
+        const ads = await Ad.find({ user: userId });
         res.status(200).json({ "type": "success", "result": ads });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
 
 exports.GetAllAds = async (req, res) => {
     try {
-        const ads = await Ad.find();
+        const hiringType = req.query.hiringType;
+        const ads = await Ad.find({ hiringType: hiringType });
         res.status(200).json({ "type": "success", "result": ads });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
@@ -97,7 +100,6 @@ exports.GetAd = async (req, res) => {
 exports.EditAd = async (req, res) => {
     try {
         console.log(req.body);
-
         res.status(200).json({ "type": "success", "result": "Edited Ad Successfully" });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });

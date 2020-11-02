@@ -14,8 +14,6 @@ const AdSchema = new Schema({
     price: { type: Number, required: true },
     doors: { type: Number, required: true },
     millage: { type: Number, required: true },
-    minSeats: { type: Number, required: true },
-    maxSeats: { type: Number, required: true },
     bodyType: { type: String, required: true },
     fuel: { type: String, required: true },
     gear: { type: String, required: true },
@@ -24,6 +22,7 @@ const AdSchema = new Schema({
     make: { type: String, required: true },
     model: { type: String, required: true },
     engine: { type: String, required: true },
+    sold: { type: Boolean, required: true },
     images: [{ type: String }],
     user: { type: Schema.Types.ObjectId, ref: "user", required: true },
 }, { timestamps: true }
