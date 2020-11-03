@@ -33,6 +33,7 @@ exports.InsertAd = async (req, res) => {
         }
     } catch (error) {
         await Helper.RemoveImages(req.files);
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
     }
 };
@@ -60,21 +61,8 @@ exports.GetAllAds = async (req, res) => {
 
 exports.FilterAds = async (req, res) => {
     try {
-        const filters = req.body;
-        const price = filters.price;
-        const minMillage = filters.minMillage;
-        const maxMillage = filters.maxMillage;
-        delete filters.price;
-        delete filters.minMillage;
-        delete filters.maxMillage;
-        console.log(filters);
-        if (price === "high") {
-            const ads = await Ads.find({ ...filters, millage: { $gte: minMillage, $lte: maxMillage } }).sort("price", -1).limit(20);
-            res.status(200).json({ "type": "success", "result": ads });
-        } else {
-            const ads = await Ads.find({ ...filters, millage: { $gte: minMillage, $lte: maxMillage } }).sort("price", 1).limit(20);
-            res.status(200).json({ "type": "success", "result": ads });
-        }
+        const ads = await Ads.find(req.body).sort("price", -1).limit(20);
+        res.status(200).json({ "type": "success", "result": ads });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
