@@ -1,6 +1,7 @@
 const Ad = require("../models/ad");
 const { validationResult } = require("express-validator");
 const Helper = require("./functions/imageResizer");
+const Ranger = require("./functions/rangeFilter");
 const User = require("../models/user");
 
 exports.InsertAd = async (req, res) => {
@@ -61,7 +62,69 @@ exports.GetAllAds = async (req, res) => {
 
 exports.FilterAds = async (req, res) => {
     try {
-        const ads = await Ads.find(req.body).sort("price", -1).limit(20);
+        let filter = req.body;
+        let rangeFilter = {};
+
+        const minSeats = filter.minseats;
+        const maxSeats = filter.maxseats;
+
+        const minPrice = filter.minprice;
+        const maxPrice = filter.maxprice;
+
+        const minModel = filter.minmodel;
+        const maxModel = filter.maxmodel;
+
+        const minMillage = filter.minmillage;
+        const maxMillage = filter.maxmillage;
+
+        const minEngine = filter.minengine;
+        const maxEngine = filter.maxengine;
+
+        delete filter.minseats;
+        delete filter.minseats;
+
+        delete filter.minprice;
+        delete filter.maxprice;
+
+        delete filter.minmodel;
+        delete filter.maxmodel;
+
+        delete filter.minmillage;
+        delete filter.maxmillage;
+
+        delete filter.minengine;
+        delete filter.maxengine;
+
+        delete filter.distance;
+
+        const seatsRange = await Ranger.RangeFilter(minSeats, maxSeats);
+        const modelRange = await Ranger.RangeFilter(minModel, maxModel);
+        const millageRange = await Ranger.RangeFilter(minMillage, maxMillage);
+        const engineRange = await Ranger.RangeFilter(minEngine, maxEngine);
+        const priceRange = await Ranger.RangeFilter(minPrice, maxPrice);
+
+        if (seatsRange !== null) {
+            rangeFilter.seats = seatsRange.range;
+        }
+        if (modelRange !== null) {
+            rangeFilter.model = modelRange.range;
+        }
+        if (millageRange !== null) {
+            rangeFilter.millage = millageRange.range;
+        }
+        if (priceRange !== null) {
+            rangeFilter.priceValue = priceRange.range;
+        }
+        if (engineRange !== null) {
+            rangeFilter.engineValue = engineRange.range;
+        }
+
+        console.log({ ...filter, ...rangeFilter });
+
+        const ads = await Ad.find({ ...filter, ...rangeFilter });
+        // .sort("price", -1).limit(20);
+        console.log(ads);
+
         res.status(200).json({ "type": "success", "result": ads });
     } catch (error) {
         console.log(error);
