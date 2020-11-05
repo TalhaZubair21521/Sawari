@@ -65,11 +65,14 @@ exports.FilterAds = async (req, res) => {
     try {
         const currentLat = req.query.currentLat;
         const currentLon = req.query.currentLon;
+
         //Creating Two Types of Filter
+
         let filter = req.body;
         let rangeFilter = {};
 
         //Getting Values of Min and Max
+
         const minSeats = filter.minseats;
         const maxSeats = filter.maxseats;
 
@@ -86,6 +89,8 @@ exports.FilterAds = async (req, res) => {
         const maxEngine = filter.maxengine;
 
         const distanceRadius = filter.distance;
+
+        console.log(distanceRadius);
 
         //Deleting values that are stored in Objects
 
@@ -138,8 +143,7 @@ exports.FilterAds = async (req, res) => {
 
         //Finding Filter
 
-        const ads = await Ad.find({ ...filter, ...rangeFilter });
-        // .sort("price", -1).limit(20);
+        const ads = await Ad.find({ ...filter, ...rangeFilter }); // .sort("price", -1).limit(20);
 
         //Query Result
 
@@ -147,17 +151,17 @@ exports.FilterAds = async (req, res) => {
 
         //Filtered by Radius
 
-        const filteredAds = ads.filter((ad) => {
-            const distance = Haversine.CalculateDistance(currentLat, currentLon, ad.latitude, ad.longitude);
-            if (distance <= distanceRadius) {
-                return ad;
-            }
-            return false;
-        });
+        // const filteredAds = ads.filter((ad) => {
+        //     const distance = Haversine.CalculateDistance(currentLat, currentLon, ad.latitude, ad.longitude);
+        //     if (distance <= distanceRadius) {
+        //         return ad;
+        //     }
+        //     return false;
+        // });
 
         //Sending Reponse
 
-        res.status(200).json({ "type": "success", "result": filteredAds });
+        res.status(200).json({ "type": "success", "result": ads });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
