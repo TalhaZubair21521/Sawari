@@ -151,13 +151,15 @@ exports.FilterAds = async (req, res) => {
 
         //Filtered by Radius
 
-        // const filteredAds = ads.filter((ad) => {
-        //     const distance = Haversine.CalculateDistance(currentLat, currentLon, ad.latitude, ad.longitude);
-        //     if (distance <= distanceRadius) {
-        //         return ad;
-        //     }
-        //     return false;
-        // });
+        if (!(typeof distanceRadius === 'undefined')) {
+            // const filteredAds = ads.filter((ad) => {
+            //     const distance = Haversine.CalculateDistance(currentLat, currentLon, ad.latitude, ad.longitude);
+            //     if (distance <= distanceRadius) {
+            //         return ad;
+            //     }
+            //     return false;
+            // });
+        }
 
         //Sending Reponse
 

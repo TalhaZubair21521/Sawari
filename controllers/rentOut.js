@@ -186,14 +186,15 @@ exports.GetFilteredRentOuts = async (req, res) => {
 
         //Filtered by Radius
 
-        // const filteredAds = ads.filter((ad) => {
-        //     const distance = Haversine.CalculateDistance(currentLat, currentLon, ad.latitude, ad.longitude);
-        //     if (distance <= distanceRadius) {
-        //         return ad;
-        //     }
-        //     return false;
-        // });
-
+        if (!(typeof distanceRadius === 'undefined')) {
+            // const filteredRents = rents.filter((rent) => {
+            //     const distance = Haversine.CalculateDistance(currentLat, currentLon, rent.latitude, rent.longitude);
+            //     if (distance <= distanceRadius) {
+            //         return rent;
+            //     }
+            //     return false;
+            // });
+        }
         //Sending Reponse
 
         res.status(200).json({ "type": "success", "result": rents });

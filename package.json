@@ -1,13 +1,13 @@
 {
   "name": "sawari",
   "version": "0.0.0",
-  "description": "Sawari Backend",
+  "description": "Sawari",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon"
   },
-  "author": "",
+  "author": "Muhammad Talha Zubair",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
