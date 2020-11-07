@@ -14,7 +14,7 @@ exports.InsertRentOut = async (req, res) => {
             return;
         } else {
             const rent = new Rent(req.body);
-            rent.sold = false;
+            rent.rentOuted = false;
             const user = await User.findById(rent.user);
             if (!user) {
                 await Remover.RemoveImages(req.files);
@@ -53,6 +53,7 @@ exports.GetRentOutByUser = async (req, res) => {
 
 exports.GetAllRentOuts = async (req, res) => {
     try {
+        console.log("here");
         const rentOuts = await Rent.find();
         res.status(200).json({ "type": "success", "result": rentOuts });
     } catch (error) {
@@ -98,8 +99,7 @@ exports.UpdateRentOut = async (req, res) => {
 }
 exports.GetFilteredRentOuts = async (req, res) => {
     try {
-        const currentLat = req.query.currentLat;
-        const currentLon = req.query.currentLon;
+        console.log("Rent Out Body :", req.body);
 
         //Creating Two Types of Filter
 
@@ -107,6 +107,12 @@ exports.GetFilteredRentOuts = async (req, res) => {
         let rangeFilter = {};
 
         //Getting Values of Min and Max
+
+        const currentLat = filter.currentLat;
+        const currentLon = filter.currentLon;
+
+        delete filter.currentLat;
+        delete filter.currentLon;
 
         const minSeats = filter.minseats;
         const maxSeats = filter.maxseats;
@@ -125,12 +131,12 @@ exports.GetFilteredRentOuts = async (req, res) => {
 
         const distanceRadius = filter.distance;
 
-        console.log(distanceRadius);
+        console.log("Distance Radius :", distanceRadius);
 
         //Deleting values that are stored in Objects
 
         delete filter.minseats;
-        delete filter.minseats;
+        delete filter.maxseats;
 
         delete filter.minprice;
         delete filter.maxprice;
@@ -174,30 +180,34 @@ exports.GetFilteredRentOuts = async (req, res) => {
 
         //Displaying Final Filters
 
-        console.log({ ...filter, ...rangeFilter });
+        const completeFilter = { ...filter, ...rangeFilter };
+        console.log("Filter :", completeFilter);
 
         //Finding Filter
 
-        const rents = await Rent.find({ ...filter, ...rangeFilter }); // .sort("price", -1).limit(20);
+        const rents = await Rent.find(completeFilter); // .sort("price", -1).limit(20);
 
         //Query Result
 
-        console.log(rents);
+        console.log("Rents :", rents.length);
 
         //Filtered by Radius
-
         if (!(typeof distanceRadius === 'undefined')) {
-            // const filteredRents = rents.filter((rent) => {
-            //     const distance = Haversine.CalculateDistance(currentLat, currentLon, rent.latitude, rent.longitude);
-            //     if (distance <= distanceRadius) {
-            //         return rent;
-            //     }
-            //     return false;
-            // });
+            console.log("There was Radius")
+            const filteredRents = rents.filter((rent) => {
+                const distance = Haversine.CalculateDistance(currentLat, currentLon, rent.latitude, rent.longitude);
+                if (distance <= distanceRadius) {
+                    return rent;
+                }
+                return false;
+            });
+            console.log("Filter :", filteredRents.length);
+            res.status(200).json({ "type": "success", "result": filteredRents });
+            return;
+        } else {
+            console.log("There was no Radius");
+            res.status(200).json({ "type": "success", "result": rents });
         }
-        //Sending Reponse
-
-        res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
