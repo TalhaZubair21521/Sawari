@@ -63,6 +63,8 @@ exports.GetAllAds = async (req, res) => {
 
 exports.FilterAds = async (req, res) => {
 	try {
+
+		//Changing Model to Model Key from min max from Frontend Request
 		console.log("Body :", req.body);
 
 		//Creating Two Types of Filter
@@ -84,9 +86,6 @@ exports.FilterAds = async (req, res) => {
 		const minPrice = filter.minprice;
 		const maxPrice = filter.maxprice;
 
-		const minModel = filter.minmodel;
-		const maxModel = filter.maxmodel;
-
 		const minMillage = filter.minmillage;
 		const maxMillage = filter.maxmillage;
 
@@ -105,9 +104,6 @@ exports.FilterAds = async (req, res) => {
 		delete filter.minprice;
 		delete filter.maxprice;
 
-		delete filter.minmodel;
-		delete filter.maxmodel;
-
 		delete filter.minmillage;
 		delete filter.maxmillage;
 
@@ -119,7 +115,6 @@ exports.FilterAds = async (req, res) => {
 		//Range Filter Finder
 
 		const seatsRange = await Ranger.RangeFilter(minSeats, maxSeats);
-		const modelRange = await Ranger.RangeFilter(minModel, maxModel);
 		const millageRange = await Ranger.RangeFilter(minMillage, maxMillage);
 		const engineRange = await Ranger.RangeFilter(minEngine, maxEngine);
 		const priceRange = await Ranger.RangeFilter(minPrice, maxPrice);
@@ -128,9 +123,6 @@ exports.FilterAds = async (req, res) => {
 
 		if (seatsRange !== null) {
 			rangeFilter.seats = seatsRange.range;
-		}
-		if (modelRange !== null) {
-			rangeFilter.model = modelRange.range;
 		}
 		if (millageRange !== null) {
 			rangeFilter.millage = millageRange.range;

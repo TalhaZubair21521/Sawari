@@ -17,6 +17,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 const user = require("./routes/user");
 const ad = require("./routes/ad");
 const rent = require("./routes/rentOut");
+const model = require("./routes/model");
 
 app.use('/assets', express.static('assets'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -24,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use("/user", user.routes);
 app.use("/ad", ad.routes);
 app.use("/rentOut", rent.routes);
+app.use("/model", model.routes);
 
 app.get("/", function (req, res) {
     res.send("Sawari Server");
