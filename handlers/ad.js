@@ -25,5 +25,6 @@ exports.adHandler = [
     body("longitude").notEmpty().withMessage("Longtitude is Missing"),
     body("latitude").notEmpty().withMessage("Latitude is Missing"),
     body("user").notEmpty().withMessage("User is Missing"),
+    body("year").notEmpty().withMessage("Year is Missing").isNumeric().withMessage("Year must be a Number"),
     body("seats").notEmpty().withMessage("Seats is Missing").isNumeric().withMessage("Seats must be a Number"),
 ];

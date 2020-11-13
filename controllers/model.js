@@ -1,9 +1,9 @@
-const Model = require("../models/model");
+const Make = require("../models/make");
 
-exports.AddModels = async (req, res) => {
+exports.AddMake = async (req, res) => {
     try {
-        const models = new Model(req.body);
-        models.save(async (err) => {
+        const makes = new Make(req.body);
+        makes.save(async (err) => {
             if (err) {
                 res.status(400).json({ "type": "failure", "result": "Error Occured" });
             } else {
@@ -11,13 +11,14 @@ exports.AddModels = async (req, res) => {
             }
         });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
-exports.GetModels = async (req, res) => {
+exports.GetMakes = async (req, res) => {
     try {
-        const models = await Model.find('names');
-        res.send(200).json({ type: "success", result: models });
+        const makes = await Make.find();
+        res.status(200).json({ type: "success", result: makes });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });

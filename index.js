@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use("/user", user.routes);
 app.use("/ad", ad.routes);
 app.use("/rentOut", rent.routes);
-app.use("/model", model.routes);
+app.use("/make", model.routes);
 
 app.get("/", function (req, res) {
     res.send("Sawari Server");

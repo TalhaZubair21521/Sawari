@@ -6,7 +6,9 @@ const authenticator = require("../middlewares/authenticator");
 
 const router = express.Router();
 
-router.post("/addModels", authenticator.athenticate, modelControllers.AddModels);
-router.get("/getModels", authenticator.athenticate, modelControllers.GetModels);
+router.post("/addMakes",
+    // authenticator.athenticate, 
+    modelControllers.AddMake);
+router.get("/getMakes", authenticator.athenticate, modelControllers.GetMakes);
 
 exports.routes = router;
