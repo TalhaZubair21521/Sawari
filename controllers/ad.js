@@ -2,6 +2,7 @@ const Ad = require("../models/ad");
 const { validationResult } = require("express-validator");
 const Remover = require("./functions/imageResizer");
 const Ranger = require("./functions/rangeFilter");
+const SortHelpers = require("./functions/SortFunctions");
 const Haversine = require("./functions/HaversineFormula");
 const User = require("../models/user");
 
@@ -54,9 +55,10 @@ exports.GetAdsByUser = async (req, res) => {
 exports.GetAllAds = async (req, res) => {
 	try {
 		const hiringType = req.query.hiringType;
-		const ads = await Ad.find({ hiringType: hiringType });
+		const ads = await Ad.find({ hiringType: hiringType, status: false });
 		res.status(200).json({ "type": "success", "result": ads });
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
 	}
 }
@@ -69,7 +71,9 @@ exports.FilterAds = async (req, res) => {
 
 		//Creating Two Types of Filter
 
-		let filter = req.body;
+		req.body.sold = false;
+		let filter = req.body.filter;
+		let sortBy = req.body.sortBy;
 		let rangeFilter = {};
 
 		//Getting Values of Min and Max
@@ -79,6 +83,9 @@ exports.FilterAds = async (req, res) => {
 
 		delete filter.currentLat;
 		delete filter.currentLon;
+
+		const minYear = filter.minYear;
+		const maxYear = filter.maxYear;
 
 		const minSeats = filter.minseats;
 		const maxSeats = filter.maxseats;
@@ -110,6 +117,9 @@ exports.FilterAds = async (req, res) => {
 		delete filter.minengine;
 		delete filter.maxengine;
 
+		delete filter.minYear;
+		delete filter.maxYear;
+
 		delete filter.distance;
 
 		//Range Filter Finder
@@ -118,6 +128,7 @@ exports.FilterAds = async (req, res) => {
 		const millageRange = await Ranger.RangeFilter(minMillage, maxMillage);
 		const engineRange = await Ranger.RangeFilter(minEngine, maxEngine);
 		const priceRange = await Ranger.RangeFilter(minPrice, maxPrice);
+		const yearRange = await Ranger.RangeFilter(minYear, maxYear);
 
 		//Adding Filter if Exists
 
@@ -133,6 +144,9 @@ exports.FilterAds = async (req, res) => {
 		if (engineRange !== null) {
 			rangeFilter.engineValue = engineRange.range;
 		}
+		if (yearRange !== null) {
+			rangeFilter.year = yearRange.range;
+		}
 
 		//Displaying Final Filters
 
@@ -141,8 +155,18 @@ exports.FilterAds = async (req, res) => {
 
 		//Finding Filter
 
-		const ads = await Ad.find(completeFilter); // .sort("price", -1).limit(20);
+		let ads = null;
+		if (!(typeof sortBy === 'undefined') && !(sortBy === null)) {
+			console.log("Yes Sort By");
+			const column = await SortHelpers.GetKey(sortBy.column);
+			const sort = await SortHelpers.GetSortValue(sortBy.sort);
+			console.log(column, sort);
 
+			ads = await Ad.find(completeFilter).sort([[column, sort]]);
+		} else {
+			console.log("No Sort By");
+			ads = await Ad.find(completeFilter); // .sort("price", -1).limit(20);
+		}
 		//Query Result
 
 		console.log("Ads :", ads.length);
@@ -162,6 +186,7 @@ exports.FilterAds = async (req, res) => {
 			return;
 		} else {
 			console.log("There was no Radius");
+			console.log("");
 			res.status(200).json({ "type": "success", "result": ads });
 		}
 	} catch (error) {
@@ -169,6 +194,7 @@ exports.FilterAds = async (req, res) => {
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
 	}
 }
+
 
 exports.GetAd = async (req, res) => {
 	try {
@@ -185,10 +211,16 @@ exports.GetAd = async (req, res) => {
 	}
 }
 
-exports.EditAd = async (req, res) => {
+exports.ChangeSoldStatus = async (req, res) => {
 	try {
-		console.log(req.body);
-		res.status(200).json({ "type": "success", "result": "Edited Ad Successfully" });
+		const sold = req.query.sold;
+		const adID = req.query.adID;
+		const response = await Ad.findByIdAndUpdate(adID, { $set: { sold: sold } });
+		if (!response) {
+			res.status(500).json({ "type": "failure", "result": "Server not Responding. Try Again" });
+			return;
+		}
+		res.status(200).json({ "type": "success", "result": "Ad Edit Successfully" });
 	} catch (error) {
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
 	}

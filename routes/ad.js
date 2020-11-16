@@ -15,5 +15,5 @@ router.get("/getAllads", authenticator.athenticate, adControllers.GetAllAds);
 router.post("/getFilteredAds", authenticator.athenticate, adControllers.FilterAds);
 router.get("/getAd", authenticator.athenticate, adControllers.GetAd);
 router.get("/deletead", authenticator.athenticate, adControllers.DeleteAd);
-
+router.put("/changeSoldStatus", authenticator.athenticate, adControllers.ChangeSoldStatus);
 exports.routes = router;
