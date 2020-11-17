@@ -16,7 +16,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 
 const user = require("./routes/user");
 const ad = require("./routes/ad");
-const rent = require("./routes/rentOut");
+const rent = require("./routes/rent");
 const car = require("./routes/car");
 
 app.use('/assets', express.static('assets'));
@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/user", user.routes);
 app.use("/ad", ad.routes);
-app.use("/rentOut", rent.routes);
+app.use("/rent", rent.routes);
 app.use("/car", car.routes);
 
 app.get("/", function (req, res) {

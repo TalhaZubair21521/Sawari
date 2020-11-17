@@ -1,6 +1,6 @@
 const { body } = require("express-validator");
 
-exports.rentOutHandler = [
+exports.rentHandler = [
     body("name").notEmpty().withMessage("Name is Missing"),
     body("hiringType").notEmpty().withMessage("Hiring Type is Missing"),
     body("email").notEmpty().withMessage("Email is Missing").isEmail().withMessage("Invalid Email Format"),

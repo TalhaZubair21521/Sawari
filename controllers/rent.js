@@ -5,7 +5,7 @@ const Ranger = require("./functions/rangeFilter");
 const Haversine = require("./functions/HaversineFormula");
 const User = require("../models/user");
 
-exports.InsertRentOut = async (req, res) => {
+exports.InsertRent = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (errors.errors.length != 0) {
@@ -14,7 +14,7 @@ exports.InsertRentOut = async (req, res) => {
             return;
         } else {
             const rent = new Rent(req.body);
-            rent.rentOuted = false;
+            rent.sold = false;
             const user = await User.findById(rent.user);
             if (!user) {
                 await Remover.RemoveImages(req.files);
@@ -40,35 +40,35 @@ exports.InsertRentOut = async (req, res) => {
     }
 };
 
-exports.GetRentOutByUser = async (req, res) => {
+exports.GetRentsByUser = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rentOuts = await Rent.find({ user: userId });
-        res.status(200).json({ "type": "success", "result": rentOuts });
+        const rents = await Rent.find({ user: userId });
+        res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
 
-exports.GetAllRentOuts = async (req, res) => {
+exports.GetAllRents = async (req, res) => {
     try {
-        console.log("here");
-        const rentOuts = await Rent.find();
-        res.status(200).json({ "type": "success", "result": rentOuts });
+        const rents = await Rent.find();
+        res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
 
-exports.GetRentOut = async (req, res) => {
+exports.GetRent = async (req, res) => {
     try {
-        const rentOut = await Ad.findById(req.query.rentOutId);
-        if (rentOut) {
-            res.status(200).json({ "type": "success", "result": rentOut });
+        console.log(req.query);
+        const rent = await Ad.findById(req.query.rentId);
+        if (rent) {
+            res.status(200).json({ "type": "success", "result": rent });
             return;
         } else {
-            res.status(401).json({ "type": "failure", "result": "Rent out does not exists" });
+            res.status(401).json({ "type": "failure", "result": "Rent Does Not Exists" });
             return;
         }
     } catch (error) {
@@ -76,34 +76,19 @@ exports.GetRentOut = async (req, res) => {
     }
 }
 
-exports.DeleteRentOut = async (req, res) => {
-    try {
-        const response = await Rent.findByIdAndDelete(req.query.rentOutId);
-        if (response) {
-            res.status(200).json({ "type": "success", "result": "Rent Out Deleted Successfully" });
-        } else {
-            res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-        }
-    } catch (error) {
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-    }
-}
 
-exports.UpdateRentOut = async (req, res) => {
+
+exports.GetFilteredRents = async (req, res) => {
     try {
-        console.log(req.body);
-        res.status(200).json({ "type": "success", "result": "Rent Out Updated Successfully" });
-    } catch (error) {
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-    }
-}
-exports.GetFilteredRentOuts = async (req, res) => {
-    try {
-        console.log("Rent Out Body :", req.body);
+
+        //Changing Model to Model Key from min max from Frontend Request
+        console.log("Body :", req.body);
 
         //Creating Two Types of Filter
 
-        let filter = req.body;
+        req.body.sold = false;
+        let filter = req.body.filter;
+        let sortBy = req.body.sortBy;
         let rangeFilter = {};
 
         //Getting Values of Min and Max
@@ -114,14 +99,14 @@ exports.GetFilteredRentOuts = async (req, res) => {
         delete filter.currentLat;
         delete filter.currentLon;
 
+        const minYear = filter.minYear;
+        const maxYear = filter.maxYear;
+
         const minSeats = filter.minseats;
         const maxSeats = filter.maxseats;
 
         const minPrice = filter.minprice;
         const maxPrice = filter.maxprice;
-
-        const minModel = filter.minmodel;
-        const maxModel = filter.maxmodel;
 
         const minMillage = filter.minmillage;
         const maxMillage = filter.maxmillage;
@@ -141,32 +126,29 @@ exports.GetFilteredRentOuts = async (req, res) => {
         delete filter.minprice;
         delete filter.maxprice;
 
-        delete filter.minmodel;
-        delete filter.maxmodel;
-
         delete filter.minmillage;
         delete filter.maxmillage;
 
         delete filter.minengine;
         delete filter.maxengine;
 
+        delete filter.minYear;
+        delete filter.maxYear;
+
         delete filter.distance;
 
         //Range Filter Finder
 
         const seatsRange = await Ranger.RangeFilter(minSeats, maxSeats);
-        const modelRange = await Ranger.RangeFilter(minModel, maxModel);
         const millageRange = await Ranger.RangeFilter(minMillage, maxMillage);
         const engineRange = await Ranger.RangeFilter(minEngine, maxEngine);
         const priceRange = await Ranger.RangeFilter(minPrice, maxPrice);
+        const yearRange = await Ranger.RangeFilter(minYear, maxYear);
 
         //Adding Filter if Exists
 
         if (seatsRange !== null) {
             rangeFilter.seats = seatsRange.range;
-        }
-        if (modelRange !== null) {
-            rangeFilter.model = modelRange.range;
         }
         if (millageRange !== null) {
             rangeFilter.millage = millageRange.range;
@@ -177,6 +159,9 @@ exports.GetFilteredRentOuts = async (req, res) => {
         if (engineRange !== null) {
             rangeFilter.engineValue = engineRange.range;
         }
+        if (yearRange !== null) {
+            rangeFilter.year = yearRange.range;
+        }
 
         //Displaying Final Filters
 
@@ -185,8 +170,18 @@ exports.GetFilteredRentOuts = async (req, res) => {
 
         //Finding Filter
 
-        const rents = await Rent.find(completeFilter); // .sort("price", -1).limit(20);
+        let rents = null;
+        if (!(typeof sortBy === 'undefined') && !(sortBy === null)) {
+            console.log("Yes Sort By");
+            const column = await SortHelpers.GetKey(sortBy.column);
+            const sort = await SortHelpers.GetSortValue(sortBy.sort);
+            console.log(column, sort);
 
+            rents = await Rent.find(completeFilter).sort([[column, sort]]);
+        } else {
+            console.log("No Sort By");
+            rents = await Rent.find(completeFilter); // .sort("price", -1).limit(20);
+        }
         //Query Result
 
         console.log("Rents :", rents.length);
@@ -206,6 +201,7 @@ exports.GetFilteredRentOuts = async (req, res) => {
             return;
         } else {
             console.log("There was no Radius");
+            console.log("");
             res.status(200).json({ "type": "success", "result": rents });
         }
     } catch (error) {
