@@ -25,20 +25,22 @@ exports.AddCars = async (req, res) => {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
+
 exports.GetMakes = async (req, res) => {
     try {
         const cars = await Car.distinct('make');
-        res.status(200).json({ "type": "success", "result": cars });
+        res.status(200).json({ "type": "success", "result": ["unlisted", ...cars] });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
+
 exports.GetModelsByMake = async (req, res) => {
     try {
         const make = req.query.make;
-        const cars = await Car.find({ make: make }, 'model');
-        res.status(200).json({ "type": "success", "result": cars });
+        const cars = await Car.distinct('model', { make: make });
+        res.status(200).json({ "type": "success", "result": ["unlisted", ...cars] });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
