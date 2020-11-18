@@ -11,7 +11,7 @@ const authenticator = require("../middlewares/authenticator");
 const router = express.Router();
 
 router.post("/insertRent", rentImagesMiddleware.upload.array('images'), authenticator.athenticate, rentHandler.rentHandler, rentControllers.InsertRent);
-router.post("/updateRent", rentImagesMiddleware.upload.array('images'), authenticator.athenticate, rentHandler.rentHandler, rentControllers.UpdateRent);
+router.put("/updateRent", rentImagesMiddleware.upload.array('images'), authenticator.athenticate, rentHandler.rentHandler, rentControllers.UpdateRent);
 router.get("/getRentByUser", authenticator.athenticate, rentControllers.GetRentsByUser);
 router.get("/getAllRent", authenticator.athenticate, rentControllers.GetAllRents);
 router.post("/getFilteredRent", authenticator.athenticate, rentControllers.GetFilteredRents);

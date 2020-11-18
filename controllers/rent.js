@@ -218,7 +218,7 @@ exports.UpdateRent = async (req, res) => {
         let newFiles = req.files;
         delete body.oldImages;
         let updatedRent = new Rent(body);
-        let oldRent = await Ad.findById(updatedRent._id);
+        let oldRent = await Rent.findById(updatedRent._id);
         let oldImagesFromDatabase = oldRent.images
         const errors = validationResult(req);
         if (errors.errors.length != 0) {
