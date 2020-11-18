@@ -44,7 +44,7 @@ exports.InsertAd = async (req, res) => {
 exports.GetAdsByUser = async (req, res) => {
 	try {
 		const userId = req.query.userId;
-		const ads = await Ad.find({ user: userId });
+		const ads = await Ad.find({ user: userId }).sort('createdAt');
 		res.status(200).json({ "type": "success", "result": ads });
 	} catch (error) {
 		console.log(error);
@@ -161,7 +161,6 @@ exports.FilterAds = async (req, res) => {
 			const column = await SortHelpers.GetKey(sortBy.column);
 			const sort = await SortHelpers.GetSortValue(sortBy.sort);
 			console.log(column, sort);
-
 			ads = await Ad.find(completeFilter).sort([[column, sort]]);
 		} else {
 			console.log("No Sort By");
@@ -194,7 +193,6 @@ exports.FilterAds = async (req, res) => {
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
 	}
 }
-
 
 exports.GetAd = async (req, res) => {
 	try {
@@ -236,5 +234,41 @@ exports.DeleteAd = async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+	}
+}
+
+exports.UpdateAd = async (req, res) => {
+	try {
+		console.log(req.body);
+		const errors = validationResult(req);
+		if (errors.errors.length != 0) {
+			await Remover.RemoveImages(req.files);
+			res.status(400).json({ type: "failure", "result": errors.errors[0].msg });
+			return;
+		} else {
+			const ad = new Ad(req.body);
+			ad.sold = false;
+			const user = await User.findById(ad.user);
+			if (!user) {
+				await Remover.RemoveImages(req.files);
+				res.status(401).json({ type: "failure", "result": "No Such User" });
+				return;
+			}
+			const filesArray = await Remover.ResizeImages(ad._id, req.files);
+			ad.images = filesArray;
+			ad.save(async (err) => {
+				if (!err) {
+					res.status(200).json({ "type": "success", "result": "Ad Successfully Posted" });
+				} else {
+					console.log("Error as : " + err);
+					await Remover.RemoveImages(req.files);
+					res.status(500).json({ "type": "failure", "result": "Server Not Responding" + err });
+				}
+			});
+		}
+	} catch (error) {
+		await Remover.RemoveImages(req.files);
+		console.log(error);
+		res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
 	}
 }

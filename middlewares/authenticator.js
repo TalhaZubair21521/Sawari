@@ -11,6 +11,7 @@ exports.athenticate = async (req, res, next) => {
         bearerToken = bearerHeader.split(' ')[1];
         if (bearerToken === "guest") {
             next();
+            return;
         }
         jwt.verify(bearerToken, jwtSecretKey, async (err, data) => {
             if (err) {
