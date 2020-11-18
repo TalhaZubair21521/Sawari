@@ -4,6 +4,7 @@ const Remover = require("./functions/imageResizer");
 const Ranger = require("./functions/rangeFilter");
 const SortHelpers = require("./functions/SortFunctions");
 const Haversine = require("./functions/HaversineFormula");
+const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
 
 exports.InsertAd = async (req, res) => {
@@ -55,7 +56,7 @@ exports.GetAdsByUser = async (req, res) => {
 exports.GetAllAds = async (req, res) => {
 	try {
 		const hiringType = req.query.hiringType;
-		const ads = await Ad.find({ hiringType: hiringType, status: false });
+		const ads = await Ad.find({ hiringType: hiringType });
 		res.status(200).json({ "type": "success", "result": ads });
 	} catch (error) {
 		console.log(error);
@@ -65,9 +66,7 @@ exports.GetAllAds = async (req, res) => {
 
 exports.FilterAds = async (req, res) => {
 	try {
-
-		//Changing Model to Model Key from min max from Frontend Request
-		console.log("Body :", req.body);
+		// console.log("Body :", req.body);
 
 		//Creating Two Types of Filter
 
@@ -101,7 +100,7 @@ exports.FilterAds = async (req, res) => {
 
 		const distanceRadius = filter.distance;
 
-		console.log("Distance Radius :", distanceRadius);
+		// console.log("Distance Radius :", distanceRadius);
 
 		//Deleting values that are stored in Objects
 
@@ -151,28 +150,28 @@ exports.FilterAds = async (req, res) => {
 		//Displaying Final Filters
 
 		const completeFilter = { ...filter, ...rangeFilter };
-		console.log("Filter :", completeFilter);
+		// console.log("Filter :", completeFilter);
 
 		//Finding Filter
 
 		let ads = null;
 		if (!(typeof sortBy === 'undefined') && !(sortBy === null)) {
-			console.log("Yes Sort By");
+			// console.log("Yes Sort By");
 			const column = await SortHelpers.GetKey(sortBy.column);
 			const sort = await SortHelpers.GetSortValue(sortBy.sort);
 			console.log(column, sort);
 			ads = await Ad.find(completeFilter).sort([[column, sort]]);
 		} else {
-			console.log("No Sort By");
+			// console.log("No Sort By");
 			ads = await Ad.find(completeFilter); // .sort("price", -1).limit(20);
 		}
 		//Query Result
 
-		console.log("Ads :", ads.length);
+		// console.log("Ads :", ads.length);
 
 		//Filtered by Radius
 		if (!(typeof distanceRadius === 'undefined')) {
-			console.log("There was Radius")
+			// console.log("There was Radius")
 			const filteredAds = ads.filter((ad) => {
 				const distance = Haversine.CalculateDistance(currentLat, currentLon, ad.latitude, ad.longitude);
 				if (distance <= distanceRadius) {
@@ -180,31 +179,16 @@ exports.FilterAds = async (req, res) => {
 				}
 				return false;
 			});
-			console.log("Filter :", filteredAds.length);
+			// console.log("Filter :", filteredAds.length);
 			res.status(200).json({ "type": "success", "result": filteredAds });
 			return;
 		} else {
-			console.log("There was no Radius");
-			console.log("");
+			// console.log("There was no Radius");
+			// console.log("");
 			res.status(200).json({ "type": "success", "result": ads });
 		}
 	} catch (error) {
 		console.log(error);
-		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-	}
-}
-
-exports.GetAd = async (req, res) => {
-	try {
-		const ad = await Ad.findById(req.query.adId);
-		if (ad) {
-			res.status(200).json({ "type": "success", "result": ad });
-			return;
-		} else {
-			res.status(401).json({ "type": "failure", "result": "Ad does not exists" });
-			return;
-		}
-	} catch (error) {
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
 	}
 }
@@ -224,47 +208,33 @@ exports.ChangeSoldStatus = async (req, res) => {
 	}
 }
 
-exports.DeleteAd = async (req, res) => {
-	try {
-		const response = await Ad.findByIdAndDelete(req.query.adId);
-		if (response) {
-			res.status(200).json({ "type": "success", "result": "Ad Deleted Successfully" });
-		} else {
-			res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-		}
-	} catch (error) {
-		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-	}
-}
 
 exports.UpdateAd = async (req, res) => {
 	try {
-		console.log(req.body);
+		let body = req.body;
+		let deletedImages = await ArrayFunctions.ConvertToArray(JSON.parse(body.oldImages));
+		let newFiles = req.files;
+		delete body.oldImages;
+		let updatedAd = new Ad(body);
+		let oldAd = await Ad.findById(updatedAd._id);
+		let oldImagesFromDatabase = oldAd.images
 		const errors = validationResult(req);
 		if (errors.errors.length != 0) {
 			await Remover.RemoveImages(req.files);
 			res.status(400).json({ type: "failure", "result": errors.errors[0].msg });
 			return;
 		} else {
-			const ad = new Ad(req.body);
-			ad.sold = false;
-			const user = await User.findById(ad.user);
+			const user = await User.findById(updatedAd.user);
 			if (!user) {
 				await Remover.RemoveImages(req.files);
 				res.status(401).json({ type: "failure", "result": "No Such User" });
 				return;
 			}
-			const filesArray = await Remover.ResizeImages(ad._id, req.files);
-			ad.images = filesArray;
-			ad.save(async (err) => {
-				if (!err) {
-					res.status(200).json({ "type": "success", "result": "Ad Successfully Posted" });
-				} else {
-					console.log("Error as : " + err);
-					await Remover.RemoveImages(req.files);
-					res.status(500).json({ "type": "failure", "result": "Server Not Responding" + err });
-				}
-			});
+			const filesArray = await Remover.ResizeImages(updatedAd._id, newFiles);
+			const updatedArray = await ArrayFunctions.UpdatedArray(deletedImages, oldImagesFromDatabase, filesArray);
+			updatedAd.images = updatedArray;
+			await Ad.findByIdAndUpdate(updatedAd._id, { $set: updatedAd });
+			res.status(200).json({ type: "success", result: "Ad Updated Successfully" });
 		}
 	} catch (error) {
 		await Remover.RemoveImages(req.files);

@@ -10,8 +10,5 @@ var storage = multer.diskStorage({
 });
 
 exports.upload = multer({
-    storage: storage,
-    limits: {
-        files: 8,
-    }
+    storage: storage
 });

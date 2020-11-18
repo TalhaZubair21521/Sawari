@@ -6,21 +6,15 @@ const adControllers = require("../controllers/ad");
 
 const adImagesMiddleware = require("../middlewares/ImagesMiddleware");
 
-const updateImagesMiddleware = require("../middlewares/UpdateImagesMiddleware");
-
 const authenticator = require("../middlewares/authenticator");
 
 const router = express.Router();
 
 router.post("/insertAd", adImagesMiddleware.upload.array('images'), authenticator.athenticate, adHandler.adHandler, adControllers.InsertAd);
-router.post("/updateAd", updateImagesMiddleware.upload.array('images'), authenticator.athenticate, adHandler.adHandler, adControllers.UpdateAd);
-
+router.put("/updateAd", adImagesMiddleware.upload.array('images'), authenticator.athenticate, adHandler.adHandler, adControllers.UpdateAd);
 router.get("/getAdsByUser", authenticator.athenticate, adControllers.GetAdsByUser);
 router.get("/getAllads", authenticator.athenticate, adControllers.GetAllAds);
 router.post("/getFilteredAds", authenticator.athenticate, adControllers.FilterAds);
-
-router.get("/getAd", authenticator.athenticate, adControllers.GetAd);
-router.get("/deletead", authenticator.athenticate, adControllers.DeleteAd);
 router.put("/changeSoldStatus", authenticator.athenticate, adControllers.ChangeSoldStatus);
 
 exports.routes = router;

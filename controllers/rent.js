@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const Remover = require("./functions/imageResizer");
 const Ranger = require("./functions/rangeFilter");
 const Haversine = require("./functions/HaversineFormula");
+const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
 
 exports.InsertRent = async (req, res) => {
@@ -14,7 +15,7 @@ exports.InsertRent = async (req, res) => {
             return;
         } else {
             const rent = new Rent(req.body);
-            rent.sold = false;
+            rent.rentOuted = false;
             const user = await User.findById(rent.user);
             if (!user) {
                 await Remover.RemoveImages(req.files);
@@ -25,7 +26,7 @@ exports.InsertRent = async (req, res) => {
             rent.images = filesArray;
             rent.save(async (err) => {
                 if (!err) {
-                    res.status(200).json({ "type": "success", "result": "Ad Successfully Posted" });
+                    res.status(200).json({ "type": "success", "result": "Rent Successfully Posted" });
                 } else {
                     console.log("Error as : " + err);
                     await Remover.RemoveImages(req.files);
@@ -43,7 +44,7 @@ exports.InsertRent = async (req, res) => {
 exports.GetRentsByUser = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rents = await Rent.find({ user: userId });
+        const rents = await Rent.find({ user: userId }).sort('createdAt');
         res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         console.log(error);
@@ -53,29 +54,13 @@ exports.GetRentsByUser = async (req, res) => {
 
 exports.GetAllRents = async (req, res) => {
     try {
-        const rents = await Rent.find();
+        const hiringType = req.query.hiringType;
+        const rents = await Rent.find({ hiringType: hiringType });
         res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
-
-exports.GetRent = async (req, res) => {
-    try {
-        console.log(req.query);
-        const rent = await Ad.findById(req.query.rentId);
-        if (rent) {
-            res.status(200).json({ "type": "success", "result": rent });
-            return;
-        } else {
-            res.status(401).json({ "type": "failure", "result": "Rent Does Not Exists" });
-            return;
-        }
-    } catch (error) {
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-    }
-}
-
 
 
 exports.GetFilteredRents = async (req, res) => {
@@ -207,5 +192,55 @@ exports.GetFilteredRents = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+
+exports.ChangeRentOutedStatus = async (req, res) => {
+    try {
+        const rentOuted = req.query.rentOuted;
+        const rentID = req.query.rentID;
+        const response = await Rent.findByIdAndUpdate(rentID, { $set: { rentOuted: rentOuted } });
+        if (!response) {
+            res.status(500).json({ "type": "failure", "result": "Server not Responding. Try Again" });
+            return;
+        }
+        res.status(200).json({ "type": "success", "result": "Rent Edit Successfully" });
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+exports.UpdateRent = async (req, res) => {
+    try {
+        let body = req.body;
+        let deletedImages = await ArrayFunctions.ConvertToArray(JSON.parse(body.oldImages));
+        let newFiles = req.files;
+        delete body.oldImages;
+        let updatedRent = new Rent(body);
+        let oldRent = await Ad.findById(updatedRent._id);
+        let oldImagesFromDatabase = oldRent.images
+        const errors = validationResult(req);
+        if (errors.errors.length != 0) {
+            await Remover.RemoveImages(req.files);
+            res.status(400).json({ type: "failure", "result": errors.errors[0].msg });
+            return;
+        } else {
+            const user = await User.findById(updatedRent.user);
+            if (!user) {
+                await Remover.RemoveImages(req.files);
+                res.status(401).json({ type: "failure", "result": "No Such User" });
+                return;
+            }
+            const filesArray = await Remover.ResizeImages(updatedRent._id, newFiles);
+            const updatedArray = await ArrayFunctions.UpdatedArray(deletedImages, oldImagesFromDatabase, filesArray);
+            updatedRent.images = updatedArray;
+            await Rent.findByIdAndUpdate(updatedRent._id, { $set: updatedRent });
+            res.status(200).json({ type: "success", result: "Rent Updated Successfully" });
+        }
+    } catch (error) {
+        await Remover.RemoveImages(req.files);
+        console.log(error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
     }
 }
