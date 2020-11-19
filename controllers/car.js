@@ -19,18 +19,18 @@ exports.AddCars = async (req, res) => {
             const c = new Car({ make: car["Make"], model: car["Model"] });
             await c.save();
         });
-        let c = new Car({ make: "", model: "" });
-        await c.save();
-        c = new Car({ make: "", model: "" });
-        await c.save();
-        c = new Car({ make: "", model: "" });
-        await c.save();
-        c = new Car({ make: "", model: "" });
-        await c.save();
-        c = new Car({ make: "", model: "" });
-        await c.save();
-        c = new Car({ make: "", model: "" });
-        await c.save();
+        // let c = new Car({ make: "", model: "" });
+        // await c.save();
+        // c = new Car({ make: "", model: "" });
+        // await c.save();
+        // c = new Car({ make: "", model: "" });
+        // await c.save();
+        // c = new Car({ make: "", model: "" });
+        // await c.save();
+        // c = new Car({ make: "", model: "" });
+        // await c.save();
+        // c = new Car({ make: "", model: "" });
+        // await c.save();
         res.send("Added")
     } catch (error) {
         console.log(error);

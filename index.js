@@ -3,6 +3,8 @@ const app = express();
 const bodyparser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
+const compression = require('compression');
+const morgan = require('morgan');
 
 require("dotenv").config();
 require("./database/connect");
@@ -11,6 +13,8 @@ app.use(cors());
 const port = process.env.PORT || 3000;
 const host = process.env.HOST;
 
+app.use(morgan('dev'));
+app.use(compression())
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 

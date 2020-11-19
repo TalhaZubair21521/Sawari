@@ -8,7 +8,6 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 exports.Signup = async (req, res) => {
     try {
         const errors = validationResult(req);
-        console.log(errors);
         if (errors.errors.length != 0) {
             res.status(400).json({ type: "failure", "result": errors.errors[0].msg });
             return;
@@ -45,7 +44,7 @@ exports.Signin = async (req, res) => {
         } else {
             const isEqual = await User.isPasswordEqual(req.query.password, user.password);
             if (isEqual) {
-                const token = await JWT.sign({ username: user.name }, JWT_SECRET_KEY);
+                const token = JWT.sign({ username: user.name }, JWT_SECRET_KEY);
                 res.status(200).json({ "type": "success", "result": "User Login Successfully", "token": token, "id": user._id });
             } else {
                 res.status(401).json({ "type": "failure", "result": "Wrong Password" });
@@ -56,3 +55,29 @@ exports.Signin = async (req, res) => {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 };
+
+exports.UpdateProfile = async (req, res) => {
+    try {
+        console.log(req.body);
+        res.status(200).json({ "type": "success", "result": "Update Profile" });
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+exports.OauthGoogle = async (req, res) => {
+    try {
+        console.log(req.body);
+        res.status(200).json({ "type": "success", "result": "Facebook OAuth" });
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+exports.OauthFacebook = async (req, res) => {
+    try {
+        console.log(req.body);
+        res.status(200).json({ "type": "success", "result": "Google OAuth" });
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}

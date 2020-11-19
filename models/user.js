@@ -7,6 +7,8 @@ const UserSchema = new Schema({
     id: Schema.ObjectId,
     email: { type: String, unique: true },
     name: { type: String, required: true, trim: true },
+    phone: { type: String, trim: true },
+    image: { type: String, trim: true },
     password: { type: String, required: true },
     provider: { type: Object },
     forgetKey: { type: String, required: true },
@@ -14,7 +16,7 @@ const UserSchema = new Schema({
 );
 
 UserSchema.statics.ConvertToHash = async (password) => {
-    return await bcrypt.hashSync(password, 10);
+    return bcrypt.hashSync(password, 10);
 };
 
 UserSchema.statics.isPasswordEqual = async (password, passwordFromDatabase) => {
