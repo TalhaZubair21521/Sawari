@@ -22,7 +22,7 @@ exports.InsertRent = async (req, res) => {
                 res.status(401).json({ type: "failure", "result": "No Such User" });
                 return;
             }
-            const filesArray = await Remover.ResizeImages(rent._id, req.files);
+            const filesArray = await Remover.ResizeImages("rents/" + rent._id, req.files);
             rent.images = filesArray;
             rent.save(async (err) => {
                 if (!err) {
@@ -232,7 +232,7 @@ exports.UpdateRent = async (req, res) => {
                 res.status(401).json({ type: "failure", "result": "No Such User" });
                 return;
             }
-            const filesArray = await Remover.ResizeImages(updatedRent._id, newFiles);
+            const filesArray = await Remover.ResizeImages("rents/" + updatedRent._id, newFiles);
             const updatedArray = await ArrayFunctions.UpdatedArray(deletedImages, oldImagesFromDatabase, filesArray);
             updatedRent.images = updatedArray;
             await Rent.findByIdAndUpdate(updatedRent._id, { $set: updatedRent });

@@ -40,6 +40,6 @@ app.get("/", function (req, res) {
 });
 
 server = app.listen(port, host, () => {
-    console.log("Running Server at http://" + host + ":" + port);
+    console.log("Running Server at " + host + ":" + port);
 });
 

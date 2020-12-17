@@ -23,7 +23,7 @@ exports.InsertAd = async (req, res) => {
 				res.status(401).json({ type: "failure", "result": "No Such User" });
 				return;
 			}
-			const filesArray = await Remover.ResizeImages(ad._id, req.files);
+			const filesArray = await Remover.ResizeImages("ads/" + ad._id, req.files);
 			ad.images = filesArray;
 			ad.save(async (err) => {
 				if (!err) {
@@ -230,7 +230,7 @@ exports.UpdateAd = async (req, res) => {
 				res.status(401).json({ type: "failure", "result": "No Such User" });
 				return;
 			}
-			const filesArray = await Remover.ResizeImages(updatedAd._id, newFiles);
+			const filesArray = await Remover.ResizeImages("ads/" + updatedAd._id, newFiles);
 			const updatedArray = await ArrayFunctions.UpdatedArray(deletedImages, oldImagesFromDatabase, filesArray);
 			updatedAd.images = updatedArray;
 			await Ad.findByIdAndUpdate(updatedAd._id, { $set: updatedAd });

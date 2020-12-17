@@ -7,10 +7,10 @@ const UserSchema = new Schema({
     id: Schema.ObjectId,
     email: { type: String, unique: true },
     name: { type: String, required: true, trim: true },
-    phone: { type: String, trim: true },
-    image: { type: String, trim: true },
+    phone: { type: String, trim: true, default: null },
+    image: { type: String, trim: true, default: null },
     password: { type: String, required: true },
-    provider: { type: Object },
+    provider: { type: Object, default: null },
     forgetKey: { type: String, required: true },
 }, { timestamps: true }
 );

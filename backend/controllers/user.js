@@ -2,9 +2,9 @@ const User = require("../models/user");
 const { validationResult } = require("express-validator");
 const JWT = require("jsonwebtoken");
 require("dotenv").config();
-
+const Remover = require("./functions/imageResizer");
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-
+const fs = require("fs");
 exports.Signup = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -14,7 +14,6 @@ exports.Signup = async (req, res) => {
         } else {
             const user = new User(req.body);
             user.forgetKey = new Date().getTime();
-            user.provider = null;
             user.password = await User.ConvertToHash(user.password);
             const oldUser = await User.findOne({ email: user.email });
             if (oldUser) {
@@ -58,25 +57,55 @@ exports.Signin = async (req, res) => {
 
 exports.UpdateProfile = async (req, res) => {
     try {
-        console.log(req.body);
-        res.status(200).json({ "type": "success", "result": "Update Profile" });
-    } catch (error) {
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
-    }
-}
-exports.OauthGoogle = async (req, res) => {
-    try {
-        console.log(req.body);
-        res.status(200).json({ "type": "success", "result": "Facebook OAuth" });
+        const userId = req.query.userId;
+        const oldUser = await User.findById(userId);
+        if (oldUser.image === null) {
+            const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
+            const user = { ...req.body, image: filesArray[0] };
+            const response = await User.findByIdAndUpdate(userId, { $set: user });
+            if (!response) {
+                res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+                return;
+            }
+            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
+            return;
+        } else {
+            fs.unlinkSync(oldUser.image);
+            const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
+            const user = { ...req.body, image: filesArray[0] };
+            const response = await User.findByIdAndUpdate(userId, { $set: user });
+            if (!response) {
+                res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+                return;
+            }
+            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
+            return;
+        }
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
 
+
+
+
+
+
+
+
+
+exports.OauthGoogle = async (req, res) => {
+    try {
+        console.log(req.body);
+        res.status(200).json({ "type": "success", "result": "Facebook OAuth Not Working" });
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
 exports.OauthFacebook = async (req, res) => {
     try {
         console.log(req.body);
-        res.status(200).json({ "type": "success", "result": "Google OAuth" });
+        res.status(200).json({ "type": "success", "result": "Google OAuth Not Wokring Yet" });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
