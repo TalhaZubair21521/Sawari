@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const RoomSchema = new Schema(
     {
         id: Schema.ObjectId,
-        type: { type: String, required: true },
+        group: { type: Boolean, required: false },
+        name: { type: String, default: null },
         users: [{ type: Schema.Types.ObjectId, ref: "user", required: true }],
     },
     { timestamps: true }

@@ -5,6 +5,7 @@ require("dotenv").config();
 const Remover = require("./functions/imageResizer");
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const fs = require("fs");
+
 exports.Signup = async (req, res) => {
     try {
         const errors = validationResult(req);

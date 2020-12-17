@@ -159,7 +159,7 @@ exports.FilterAds = async (req, res) => {
 			// console.log("Yes Sort By");
 			const column = await SortHelpers.GetKey(sortBy.column);
 			const sort = await SortHelpers.GetSortValue(sortBy.sort);
-			console.log(column, sort);
+			// console.log(column, sort);
 			ads = await Ad.find(completeFilter).sort([[column, sort]]);
 		} else {
 			// console.log("No Sort By");

@@ -67,7 +67,7 @@ exports.GetFilteredRents = async (req, res) => {
     try {
 
         //Changing Model to Model Key from min max from Frontend Request
-        console.log("Body :", req.body);
+        // console.log("Body :", req.body);
 
         //Creating Two Types of Filter
 
@@ -101,7 +101,7 @@ exports.GetFilteredRents = async (req, res) => {
 
         const distanceRadius = filter.distance;
 
-        console.log("Distance Radius :", distanceRadius);
+        // console.log("Distance Radius :", distanceRadius);
 
         //Deleting values that are stored in Objects
 
@@ -151,29 +151,29 @@ exports.GetFilteredRents = async (req, res) => {
         //Displaying Final Filters
 
         const completeFilter = { ...filter, ...rangeFilter };
-        console.log("Filter :", completeFilter);
+        // console.log("Filter :", completeFilter);
 
         //Finding Filter
 
         let rents = null;
         if (!(typeof sortBy === 'undefined') && !(sortBy === null)) {
-            console.log("Yes Sort By");
+            // console.log("Yes Sort By");
             const column = await SortHelpers.GetKey(sortBy.column);
             const sort = await SortHelpers.GetSortValue(sortBy.sort);
-            console.log(column, sort);
+            // console.log(column, sort);
 
             rents = await Rent.find(completeFilter).sort([[column, sort]]);
         } else {
-            console.log("No Sort By");
+            // console.log("No Sort By");
             rents = await Rent.find(completeFilter); // .sort("price", -1).limit(20);
         }
         //Query Result
 
-        console.log("Rents :", rents.length);
+        // console.log("Rents :", rents.length);
 
         //Filtered by Radius
         if (!(typeof distanceRadius === 'undefined')) {
-            console.log("There was Radius")
+            // console.log("There was Radius")
             const filteredRents = rents.filter((rent) => {
                 const distance = Haversine.CalculateDistance(currentLat, currentLon, rent.latitude, rent.longitude);
                 if (distance <= distanceRadius) {
@@ -181,12 +181,12 @@ exports.GetFilteredRents = async (req, res) => {
                 }
                 return false;
             });
-            console.log("Filter :", filteredRents.length);
+            // console.log("Filter :", filteredRents.length);
             res.status(200).json({ "type": "success", "result": filteredRents });
             return;
         } else {
-            console.log("There was no Radius");
-            console.log("");
+            // console.log("There was no Radius");
+            // console.log("");
             res.status(200).json({ "type": "success", "result": rents });
         }
     } catch (error) {
