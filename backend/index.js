@@ -5,12 +5,13 @@ const cors = require("cors");
 const path = require("path");
 const compression = require('compression');
 const morgan = require('morgan');
+const SocketIO = require('socket.io');
 
 require("dotenv").config();
 require("./database/connect");
 
 app.use(cors());
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 9999;
 const host = process.env.HOST;
 
 app.use(morgan('dev'));
@@ -23,6 +24,8 @@ const ad = require("./routes/ad");
 const rent = require("./routes/rent");
 const car = require("./routes/car");
 const post = require("./routes/post");
+const test = require("./routes/tests");
+const socketConnect = require("./socket/socket");
 
 app.use('/assets', express.static('assets'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,12 +35,15 @@ app.use("/ad", ad.routes);
 app.use("/rent", rent.routes);
 app.use("/car", car.routes);
 app.use("/post", post.routes);
+app.use("/test", test.routes);
 
 app.get("/", function (req, res) {
     res.send("Sawari Server");
 });
 
-server = app.listen(port, host, () => {
+myServer = app.listen(port, host, () => {
     console.log("Running Server at " + host + ":" + port);
 });
 
+io = SocketIO(myServer);
+socketConnect(io); 

@@ -13,7 +13,7 @@ const FileSchema = new Schema(
 const PostSchema = new Schema(
     {
         id: Schema.ObjectId,
-        text: { type: String, required: true },
+        text: { type: String, default: "" },
         media: [FileSchema],
         user: { type: Schema.Types.ObjectId, ref: "user", required: true }
     },

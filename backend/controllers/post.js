@@ -22,11 +22,13 @@ exports.AddPost = async (req, res) => {
                     res.status(200).json({ "type": "success", "result": "Post Added Successfully" });
                     return;
                 }
+                console.log(err);
                 res.status(500).json({ "type": "failure", "result": err });
                 await Remover.RemoveImages(req.files);
             });
         }
     } catch (error) {
+        console.log(error);
         await Remover.RemoveImages(req.files);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
@@ -34,7 +36,7 @@ exports.AddPost = async (req, res) => {
 
 exports.GetPosts = async (req, res) => {
     try {
-        const posts = await Post.find({}).populate('user', 'name image');
+        const posts = await Post.find({}).populate('user', 'name image').sort([["createdAt", -1]]).limit(20);
         res.status(200).json({ "type": "success", "result": posts });
     } catch (error) {
         console.log(error);

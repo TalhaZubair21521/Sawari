@@ -1,0 +1,45 @@
+const fetch = require('node-fetch');
+
+exports.SendNotification = async (title, subTitle, fcmToken) => {
+    try {
+        const FETCH_URL = "https://fcm.googleapis.com/fcm/send";
+        require("dotenv").config();
+        const FIREBASE_APP_KEY = process.env.FIREBASE_APP_KEY;
+
+        const message = {
+            registration_ids: [fcmToken],
+            notification: {
+                title: title,
+                body: subTitle,
+                vibrate: 1,
+                sound: 1,
+                show_in_foreground: true,
+                priority: "high",
+                content_available: true,
+            },
+            data: { title: "Innua Notification", body: "Congrats" }
+        }
+
+        let response = await fetch(FETCH_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: FIREBASE_APP_KEY, },
+            body: JSON.stringify(message)
+        });
+
+        response = await response.json();
+        return response;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+};
+
+exports.CreateDynamicLink = async () => {
+    try {
+        //Dynamic Link Generation
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
