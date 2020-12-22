@@ -1,7 +1,7 @@
 {
-  "name": "sawari",
+  "name": "sawario",
   "version": "1.0.0",
-  "description": "Sawari",
+  "description": "Sawario",
   "main": "index.js",
   "scripts": {
     "start": "nodemon"

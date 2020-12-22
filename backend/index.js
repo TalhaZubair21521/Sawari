@@ -37,8 +37,8 @@ app.use("/car", car.routes);
 app.use("/post", post.routes);
 app.use("/test", test.routes);
 
-app.get("/", function (req, res) {
-    res.send("Sawari Server");
+app.get("/", async (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 myServer = app.listen(port, host, () => {

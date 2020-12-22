@@ -55,6 +55,7 @@ exports.GetPostByUser = async (req, res) => {
 
 exports.AddComment = async (req, res) => {
     try {
+        console.log(req.body);
         const comment = new Comment(req.body);
         const post = await Post.findById(comment.post);
         if (!post) {
@@ -65,10 +66,12 @@ exports.AddComment = async (req, res) => {
                     res.status(200).json({ "type": "success", "result": "Comment Added Successfully" });
                     return;
                 }
+                console.log(err);
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
             });
         }
     } catch (error) {
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }

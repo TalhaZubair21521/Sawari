@@ -6,7 +6,7 @@ const RoomSchema = new Schema(
     {
         id: Schema.ObjectId,
         group: { type: Boolean, required: false },
-        name: { type: String, default: null },
+        name: { type: String, default: null, index: true },
         users: [{ type: Schema.Types.ObjectId, ref: "user", required: true }],
     },
     { timestamps: true }
