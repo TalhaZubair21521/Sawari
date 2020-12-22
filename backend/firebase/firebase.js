@@ -17,7 +17,7 @@ exports.SendNotification = async (title, subTitle, fcmToken) => {
                 priority: "high",
                 content_available: true,
             },
-            data: { title: "Innua Notification", body: "Congrats" }
+            data: { title: "Sawari", body: "Congrats" }
         }
 
         let response = await fetch(FETCH_URL, {

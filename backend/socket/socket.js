@@ -29,17 +29,31 @@ module.exports = async (io) => {
                 Logic
                 if(isGroup){
                      if(message.room===null){
-                         //Create Group Room With room.name
-                         //Save Message
+                         // Check if Room Exist with such Name
+                         
+                         // Create Group Room With room.name
+                         // Save Message
+
+                         // If Exist Send to User With Socket
+                         // Send Notification
+
                      }else{
-                         //Save Message
+                         // Save Message
+
+                         // If Exist Send to User With Socket
+                         // Send Notification
                      }
                 }else{
                     if(message.room===null){
-                        //Create Individual Room with users Array
-                        //Save Message
+                        // Create Individual Room with users Array
+                        // Save Message
+                        
+                        // If Exist Send to User With Socket
+                        // Send Notification
                     }else{
-                        //Save Message
+                        // Save Message
+                        // If Exist Send to User With Socket
+                        // Send Notification
                     }
                 }
 

@@ -13,4 +13,6 @@ router.post("/addComment", authenticator.athenticate, postController.AddComment)
 router.put("/addReply", authenticator.athenticate, postController.AddReply);
 router.get("/getComments", authenticator.athenticate, postController.GetComments);
 
+router.get("/posts", postController.getPostsPaginated);
+
 exports.routes = router;

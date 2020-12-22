@@ -110,3 +110,13 @@ exports.GetComments = async (req, res) => {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
+
+exports.getPostsPaginated = async (req, res) => {
+    const { page, perPage } = req.query;
+    const options = {
+        page: parseInt(page, 10) || 1,
+        limit: parseInt(perPage, 10) || 10
+    };
+    const posts = await Post.paginate({}, options);
+    res.send({ result: posts })
+}
