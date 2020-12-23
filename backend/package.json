@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon"
   },
-  "author": "Muhammad Talha Zubair",
+  "author": "Talha",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

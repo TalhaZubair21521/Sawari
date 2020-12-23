@@ -55,7 +55,6 @@ exports.GetPostByUser = async (req, res) => {
 
 exports.AddComment = async (req, res) => {
     try {
-        console.log(req.body);
         const comment = new Comment(req.body);
         const post = await Post.findById(comment.post);
         if (!post) {

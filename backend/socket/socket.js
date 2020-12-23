@@ -1,4 +1,5 @@
-const roomController = require("../controllers/room");
+// const roomController = require("../controllers/room");
+// const Firebase = require("../firebase/firebase");
 const connectionController = require("../controllers/connection");
 
 const socketMiddlewares = require("./middlewares");
@@ -9,7 +10,6 @@ module.exports = async (io) => {
     io.on('connection', async (socket) => {
         await connectionController.createConnection(socket.userDetails._id, socket.id);
         socket.on("sendMessage", async (data) => {
-
             /*
                 Get Data From Frontend in the Following Format
                 data = {
@@ -56,7 +56,6 @@ module.exports = async (io) => {
                         // Send Notification
                     }
                 }
-
             */
         });
         socket.on("disconnect", async (data) => {

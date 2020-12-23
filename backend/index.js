@@ -42,7 +42,7 @@ app.get("/", async (req, res) => {
 });
 
 myServer = app.listen(port, host, () => {
-    console.log("Running Server at " + host + ":" + port);
+    console.log("Sawario Server running at http://" + host + ":" + port);
 });
 
 io = SocketIO(myServer);

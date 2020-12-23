@@ -17,7 +17,7 @@ exports.SendNotification = async (title, subTitle, fcmToken) => {
                 priority: "high",
                 content_available: true,
             },
-            data: { title: "Sawari", body: "Congrats" }
+            data: { title: "Sawario", body: "You have a unread Message !!" }
         }
 
         let response = await fetch(FETCH_URL, {

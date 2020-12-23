@@ -6,7 +6,7 @@ const ReplySchema = new Schema(
     {
         text: { type: String, required: true },
         user: { type: Schema.Types.ObjectId, ref: "user", required: true },
-        timestamp: { type: Date, default: Date.now() }
+        timestamps: { type: Date, default: Date.now }
     },
     { _id: false }
 );
