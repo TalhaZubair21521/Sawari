@@ -14,7 +14,7 @@ app.use(cors());
 const port = process.env.PORT || 9999;
 const host = process.env.HOST;
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(compression())
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
@@ -24,6 +24,7 @@ const ad = require("./routes/ad");
 const rent = require("./routes/rent");
 const car = require("./routes/car");
 const post = require("./routes/post");
+const room = require("./routes/room");
 const test = require("./routes/tests");
 const socketConnect = require("./socket/socket");
 
@@ -35,6 +36,7 @@ app.use("/ad", ad.routes);
 app.use("/rent", rent.routes);
 app.use("/car", car.routes);
 app.use("/post", post.routes);
+app.use("/room", room.routes);
 app.use("/test", test.routes);
 
 app.get("/", async (req, res) => {

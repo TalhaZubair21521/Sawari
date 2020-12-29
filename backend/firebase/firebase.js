@@ -36,8 +36,20 @@ exports.SendNotification = async (title, subTitle, fcmToken) => {
 
 exports.CreateDynamicLink = async () => {
     try {
-        //Dynamic Link Generation
-        return true;
+        const fetchURL = "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=[KEY_HERE]";
+        var body = {
+            "longDynamicLink": "https://example.page.link/?link=http://www.example.com/&apn=com.example.android&ibi=com.example.ios",
+            "suffix": {
+                "option": "SHORT"
+            }
+        }
+        let response = await fetch(fetchURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+        response = await response.json();
+        return response;
     } catch (error) {
         console.log(error);
         return false;

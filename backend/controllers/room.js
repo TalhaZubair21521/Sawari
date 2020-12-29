@@ -56,30 +56,49 @@ exports.Add_User_To_Room = async (roomID, userID) => {
     }
 }
 
-exports.Get_Rooms = async (userID) => {
+exports.Get_Rooms = async (req, res) => {
     try {
-        const rooms = await Room.find({ users: userID });
-        console.log(rooms);
+        const userId = req.query.userId;
+        const rooms = await Room.find({ users: userId }).populate('users', 'name image');
+        res.status(200).json({ "type": "success", "result": rooms });
     } catch (error) {
-        return false;
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 };
-
 
 exports.Save_Message = async (userID, roomID, text) => {
     try {
         const message = new Message({ author: userID, room: roomID, text: text, attachments: [] });
-        console.log(message);
+        const response = await message.save();
+        return response;
     } catch (error) {
-        return false;
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 };
 
+exports.GetMessagesOfRoom = async (req, res) => {
+    try {
+        const roomID = req.query.roomId;
+        const messages = await Message.find({ room: roomID }).populate("author", 'image').sort([["createdAt", -1]]);
+        res.status(200).json({ "type": "success", "result": messages });
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
 exports.Get_Room = async (roomID) => {
     try {
-        const messages = await Message.find({ room: roomID });
-        console.log(messages);
+        const room = await Room.findById(roomID);
+        return room;
     } catch (error) {
         return false;
+    }
+}
+
+exports.JoinGroup = async (req, res) => {
+    try {
+
+    } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }

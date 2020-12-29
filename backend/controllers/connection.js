@@ -25,8 +25,8 @@ exports.deleteConnection = async (userId) => {
 
 exports.getConnection = async (userId) => {
     try {
-        const docs = await Connection.findOne({ user: userId });
-        return docs;
+        const doc = await Connection.findOne({ user: userId });
+        return doc;
     } catch (error) {
         return false;
     }
