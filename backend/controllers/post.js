@@ -3,6 +3,7 @@ const Comment = require("../models/comment");
 const User = require("../models/user");
 
 const Remover = require("./functions/imageResizer");
+const mongoose = require("mongoose");
 
 exports.AddPost = async (req, res) => {
     try {
@@ -36,7 +37,22 @@ exports.AddPost = async (req, res) => {
 
 exports.GetPosts = async (req, res) => {
     try {
-        const posts = await Post.find({}).populate('user', 'name image').sort([["createdAt", -1]]).limit(20);
+        const userId = req.query.userId;
+        // const posts = await Post.find({}).populate('user', 'name image').sort([["createdAt", -1]]).limit(20);
+        const posts = await Post.aggregate([
+            {
+                $addFields: {
+                    isliked: { $in: [mongoose.Types.ObjectId(userId), "$likes"] }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users', localField: 'user', foreignField: '_id', as: 'user'
+                }
+            },
+            { $sort: { createdAt: -1 } },
+            { $limit: 20 }
+        ]);
         res.status(200).json({ "type": "success", "result": posts });
     } catch (error) {
         console.log(error);
@@ -118,4 +134,43 @@ exports.getPostsPaginated = async (req, res) => {
     };
     const posts = await Post.paginate({}, options);
     res.send({ result: posts })
+}
+
+exports.Liked = async (req, res) => {
+    try {
+        const userId = req.query.userId;
+        const postId = req.query.postId;
+        const post = await Post.findOne({ likes: userId });
+        if (post) {
+            res.status(200).json({ "type": "success", "result": "Your Already Liked the Post" });
+        } else {
+            const response = await Post.findByIdAndUpdate(postId, { $push: { likes: [userId] } })
+            if (!response) {
+                res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+                return;
+            }
+            res.status(200).json({ "type": "success", "result": "Post Liked Successfully" });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+exports.UnLiked = async (req, res) => {
+    try {
+        const userId = req.query.userId;
+        const postId = req.query.postId;
+        const response = await Post.findByIdAndUpdate(postId, { $pullAll: { likes: [userId] } })
+        if (!response) {
+            console.log(response);
+            res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+            return;
+        }
+        res.status(200).json({ "type": "success", "result": "Post UnLiked Successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
 }

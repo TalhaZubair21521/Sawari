@@ -11,6 +11,10 @@ router.get("/getPostsByUser", authenticator.athenticate, postController.GetPostB
 router.get("/GetPosts", authenticator.athenticate, postController.GetPosts);
 router.post("/addComment", authenticator.athenticate, postController.AddComment);
 router.put("/addReply", authenticator.athenticate, postController.AddReply);
+
+router.put("/liked", authenticator.athenticate, postController.Liked);
+router.put("/unliked", authenticator.athenticate, postController.UnLiked);
+
 router.get("/getComments", authenticator.athenticate, postController.GetComments);
 
 router.get("/posts", postController.getPostsPaginated);

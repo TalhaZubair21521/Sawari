@@ -15,11 +15,17 @@ const PostSchema = new Schema(
         id: Schema.ObjectId,
         text: { type: String, default: "" },
         media: [FileSchema],
-        user: { type: Schema.Types.ObjectId, ref: "user", required: true }
+        user: { type: Schema.Types.ObjectId, ref: "user", required: true },
+        likes: [{ type: Schema.Types.ObjectId, ref: "user", required: true }]
     },
     { timestamps: true }
 );
 
+PostSchema.virtual('details').get(function () {
+    return this.email + ' , ' + this.name;
+});
+
 PostSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("post", PostSchema);
+// .lean({ virtuals: true });

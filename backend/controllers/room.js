@@ -69,8 +69,9 @@ exports.Get_Rooms = async (req, res) => {
 exports.Save_Message = async (userID, roomID, text) => {
     try {
         const message = new Message({ author: userID, room: roomID, text: text, attachments: [] });
-        const response = await message.save();
-        return response;
+        await message.save();
+        const newresponse = await Message.findById(message._id).populate('author', 'image');
+        return newresponse;
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 
@@ -12,9 +13,9 @@ const UserSchema = new Schema({
     password: { type: String, required: true },
     provider: { type: Object, default: null },
     forgetKey: { type: String, required: true },
-}, { timestamps: true }
+},
+    { timestamps: true }
 );
-
 UserSchema.statics.ConvertToHash = async (password) => {
     return bcrypt.hashSync(password, 10);
 };

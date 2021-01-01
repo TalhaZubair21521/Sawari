@@ -45,7 +45,7 @@ exports.Signin = async (req, res) => {
             const isEqual = await User.isPasswordEqual(req.query.password, user.password);
             if (isEqual) {
                 const token = JWT.sign({ username: user.name }, JWT_SECRET_KEY);
-                res.status(200).json({ "type": "success", "result": "User Login Successfully", "token": token, "id": user._id });
+                res.status(200).json({ "type": "success", "result": "User Login Successfully", "token": token, "id": user._id, image: user.image, userDetails: user });
             } else {
                 res.status(401).json({ "type": "failure", "result": "Wrong Password" });
             }
@@ -59,22 +59,32 @@ exports.Signin = async (req, res) => {
 exports.UpdateProfile = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const oldUser = await User.findById(userId);
-        if (oldUser.image === null) {
-            const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
-            const user = { ...req.body, image: filesArray[0] };
-            const response = await User.findByIdAndUpdate(userId, { $set: user });
-            if (!response) {
-                res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+        if (req.file) {
+            const oldUser = await User.findById(userId);
+            if (oldUser.image === null) {
+                const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
+                const user = { ...req.body, image: filesArray[0] };
+                const response = await User.findByIdAndUpdate(userId, { $set: user });
+                if (!response) {
+                    res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+                    return;
+                }
+                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
+                return;
+            } else {
+                fs.unlinkSync(oldUser.image);
+                const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
+                const user = { ...req.body, image: filesArray[0] };
+                const response = await User.findByIdAndUpdate(userId, { $set: user });
+                if (!response) {
+                    res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+                    return;
+                }
+                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
                 return;
             }
-            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
-            return;
         } else {
-            fs.unlinkSync(oldUser.image);
-            const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
-            const user = { ...req.body, image: filesArray[0] };
-            const response = await User.findByIdAndUpdate(userId, { $set: user });
+            const response = await User.findByIdAndUpdate(userId, { $set: req.body });
             if (!response) {
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 return;
@@ -83,6 +93,7 @@ exports.UpdateProfile = async (req, res) => {
             return;
         }
     } catch (error) {
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
