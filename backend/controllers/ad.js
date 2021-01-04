@@ -237,6 +237,7 @@ exports.UpdateAd = async (req, res) => {
 			res.status(200).json({ type: "success", result: "Ad Updated Successfully" });
 		}
 	} catch (error) {
+		next(err);
 		await Remover.RemoveImages(req.files);
 		console.log(error);
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });

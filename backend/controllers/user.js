@@ -58,8 +58,10 @@ exports.Signin = async (req, res) => {
 
 exports.UpdateProfile = async (req, res) => {
     try {
+        console.log(req.file);
         const userId = req.query.userId;
         if (req.file) {
+            console.log("isFile");
             const oldUser = await User.findById(userId);
             if (oldUser.image === null) {
                 const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
@@ -80,16 +82,17 @@ exports.UpdateProfile = async (req, res) => {
                     res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                     return;
                 }
-                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
+                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: response });
                 return;
             }
         } else {
+            console.log("noFile");
             const response = await User.findByIdAndUpdate(userId, { $set: req.body });
             if (!response) {
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 return;
             }
-            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
+            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: response });
             return;
         }
     } catch (error) {

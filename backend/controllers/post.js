@@ -50,6 +50,7 @@ exports.GetPosts = async (req, res) => {
                     from: 'users', localField: 'user', foreignField: '_id', as: 'user'
                 }
             },
+            { $unwind: '$user' },
             { $sort: { createdAt: -1 } },
             { $limit: 20 }
         ]);
@@ -62,9 +63,28 @@ exports.GetPosts = async (req, res) => {
 
 exports.GetPostByUser = async (req, res) => {
     try {
-        const posts = await Post.find({ user: req.query.userId }).populate('user', 'name image');
+        // const posts = await Post.find({ user: req.query.userId }).populate('user', 'name image').sort([["createdAt", -1]]);
+        const posts = await Post.aggregate([
+            {
+                $match: { user: mongoose.Types.ObjectId(req.query.userId) },
+            },
+            {
+                $addFields: {
+                    isliked: { $in: [mongoose.Types.ObjectId(req.query.userId), "$likes"] }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users', localField: 'user', foreignField: '_id', as: 'user'
+                }
+            },
+            { $unwind: '$user' },
+            { $sort: { createdAt: -1 } },
+            { $limit: 20 }
+        ]);
         res.status(200).json({ "type": "success", "result": posts });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
