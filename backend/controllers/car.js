@@ -21,16 +21,6 @@ exports.AddCars = async (req, res) => {
         });
         // let c = new Car({ make: "", model: "" });
         // await c.save();
-        // c = new Car({ make: "", model: "" });
-        // await c.save();
-        // c = new Car({ make: "", model: "" });
-        // await c.save();
-        // c = new Car({ make: "", model: "" });
-        // await c.save();
-        // c = new Car({ make: "", model: "" });
-        // await c.save();
-        // c = new Car({ make: "", model: "" });
-        // await c.save();
         res.send("Added")
     } catch (error) {
         console.log(error);

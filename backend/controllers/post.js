@@ -1,7 +1,7 @@
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const User = require("../models/user");
-
+const roomController = require("../controllers/room");
 const Remover = require("./functions/imageResizer");
 const mongoose = require("mongoose");
 
@@ -42,12 +42,18 @@ exports.GetPosts = async (req, res) => {
         const posts = await Post.aggregate([
             {
                 $addFields: {
-                    isliked: { $in: [mongoose.Types.ObjectId(userId), "$likes"] }
+                    isliked: { $in: [mongoose.Types.ObjectId(userId), "$likes"] },
+                    totalLikes: { $size: ["$likes"] }
                 }
             },
             {
                 $lookup: {
                     from: 'users', localField: 'user', foreignField: '_id', as: 'user'
+                }
+            },
+            {
+                $project: {
+                    likes: false
                 }
             },
             { $unwind: '$user' },
@@ -70,7 +76,8 @@ exports.GetPostByUser = async (req, res) => {
             },
             {
                 $addFields: {
-                    isliked: { $in: [mongoose.Types.ObjectId(req.query.userId), "$likes"] }
+                    isliked: { $in: [mongoose.Types.ObjectId(req.query.userId), "$likes"] },
+                    totalLikes: { $size: ["$likes"] }
                 }
             },
             {
@@ -78,11 +85,53 @@ exports.GetPostByUser = async (req, res) => {
                     from: 'users', localField: 'user', foreignField: '_id', as: 'user'
                 }
             },
+            {
+                $project: {
+                    likes: false
+                }
+            },
             { $unwind: '$user' },
             { $sort: { createdAt: -1 } },
             { $limit: 20 }
         ]);
         res.status(200).json({ "type": "success", "result": posts });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+exports.GetPostOfOtherUser = async (req, res) => {
+    try {
+        // const posts = await Post.find({ user: req.query.userId }).populate('user', 'name image').sort([["createdAt", -1]]);
+        const userId = req.query.userId;
+        const otherUserId = req.query.otherUserId;
+        const posts = await Post.aggregate([
+            {
+                $match: { user: mongoose.Types.ObjectId(otherUserId) },
+            },
+            {
+                $addFields: {
+                    isliked: { $in: [mongoose.Types.ObjectId(userId), "$likes"] },
+                    totalLikes: { $size: ["$likes"] }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users', localField: 'user', foreignField: '_id', as: 'user'
+                }
+            },
+            {
+                $project: {
+                    likes: false
+                }
+            },
+            { $unwind: '$user' },
+            { $sort: { createdAt: -1 } },
+            { $limit: 20 }
+        ]);
+        const response = await roomController.is_Individual_Room_Already_Exist(userId, otherUserId);
+        res.status(200).json({ "type": "success", result: posts, room: response });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
@@ -160,6 +209,7 @@ exports.Liked = async (req, res) => {
     try {
         const userId = req.query.userId;
         const postId = req.query.postId;
+        console.log(userId, postId);
         const post = await Post.findOne({ likes: userId });
         if (post) {
             res.status(200).json({ "type": "success", "result": "Your Already Liked the Post" });

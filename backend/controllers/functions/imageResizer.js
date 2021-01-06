@@ -11,7 +11,7 @@ exports.ResizeImages = async (path, images) => {
         const filePath = "assets/" + image.filename;
         const destinationFilename = destinationPath + image.filename;
         files.push(destinationFilename);
-        const process = await sharp(filePath).resize(null, 300).toFile(destinationFilename);
+        const process = await sharp(filePath).resize({ height: 300, width: 300 }).withMetadata().toFile(destinationFilename);
         if (process) {
             fs.unlinkSync(filePath);
         } else {

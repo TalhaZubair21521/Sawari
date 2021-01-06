@@ -14,6 +14,7 @@ exports.Signup = async (req, res) => {
             return;
         } else {
             const user = new User(req.body);
+            user.image = "assets/users/sample.png";
             user.forgetKey = new Date().getTime();
             user.password = await User.ConvertToHash(user.password);
             const oldUser = await User.findOne({ email: user.email });
@@ -45,7 +46,13 @@ exports.Signin = async (req, res) => {
             const isEqual = await User.isPasswordEqual(req.query.password, user.password);
             if (isEqual) {
                 const token = JWT.sign({ username: user.name }, JWT_SECRET_KEY);
-                res.status(200).json({ "type": "success", "result": "User Login Successfully", "token": token, "id": user._id, image: user.image, userDetails: user });
+                // console.log(user);
+                res.status(200).json({
+                    type: "success", result: "User Login Successfully", token: token,
+                    id: user._id,
+                    image: user.image,
+                    userDetails: user
+                });
             } else {
                 res.status(401).json({ "type": "failure", "result": "Wrong Password" });
             }
@@ -58,12 +65,12 @@ exports.Signin = async (req, res) => {
 
 exports.UpdateProfile = async (req, res) => {
     try {
-        console.log(req.file);
+        // console.log(req.file);
         const userId = req.query.userId;
         if (req.file) {
-            console.log("isFile");
+            // console.log("isFile");
             const oldUser = await User.findById(userId);
-            if (oldUser.image === null) {
+            if (oldUser.image === "assets/users/sample.png") {
                 const filesArray = await Remover.ResizeImages("users/" + userId, [req.file]);
                 const user = { ...req.body, image: filesArray[0] };
                 const response = await User.findByIdAndUpdate(userId, { $set: user });
@@ -71,7 +78,8 @@ exports.UpdateProfile = async (req, res) => {
                     res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                     return;
                 }
-                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully" });
+                const newUser = await User.findById(userId);
+                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: newUser });
                 return;
             } else {
                 fs.unlinkSync(oldUser.image);
@@ -82,17 +90,19 @@ exports.UpdateProfile = async (req, res) => {
                     res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                     return;
                 }
-                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: response });
+                const newUser = await User.findById(userId);
+                res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: newUser });
                 return;
             }
         } else {
-            console.log("noFile");
+            // console.log("noFile");
             const response = await User.findByIdAndUpdate(userId, { $set: req.body });
             if (!response) {
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 return;
             }
-            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: response });
+            const newUser = await User.findById(userId);
+            res.status(200).json({ "type": "success", "result": "Profile Updated Successfully", user: newUser });
             return;
         }
     } catch (error) {
@@ -100,14 +110,6 @@ exports.UpdateProfile = async (req, res) => {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }
-
-
-
-
-
-
-
-
 
 exports.OauthGoogle = async (req, res) => {
     try {

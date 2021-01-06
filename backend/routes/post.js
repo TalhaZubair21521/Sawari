@@ -8,6 +8,7 @@ const authenticator = require("../middlewares/authenticator");
 
 router.post("/addPost", authenticator.athenticate, imagesMiddleware.upload.array('images'), postController.AddPost);
 router.get("/getPostsByUser", authenticator.athenticate, postController.GetPostByUser);
+router.get("/getPostsByOtherUser", authenticator.athenticate, postController.GetPostOfOtherUser);
 router.get("/GetPosts", authenticator.athenticate, postController.GetPosts);
 router.post("/addComment", authenticator.athenticate, postController.AddComment);
 router.put("/addReply", authenticator.athenticate, postController.AddReply);

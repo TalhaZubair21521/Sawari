@@ -4,8 +4,11 @@ const Message = require("../models/message");
 exports.is_Individual_Room_Already_Exist = async (user1, user2) => {
     try {
         const response = await Room.find({ users: { $all: [user1, user2] } })
-        console.log(response);
-        return true;
+        if (response.length === 0) {
+            return null;
+        } else {
+            return response;
+        }
     } catch (error) {
         return false;
     }
@@ -14,7 +17,8 @@ exports.is_Individual_Room_Already_Exist = async (user1, user2) => {
 exports.Create_Individual_Room = async (user1, user2) => {
     try {
         const room = new Room({ users: [user1, user2] });
-        console.log(room);
+        const response = await room.save();
+        return response;
     } catch (error) {
         return false;
     }
@@ -73,7 +77,9 @@ exports.Save_Message = async (userID, roomID, text) => {
         const newresponse = await Message.findById(message._id).populate('author', 'image');
         return newresponse;
     } catch (error) {
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+        console.log(error);
+        return false;
+        // res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 };
 
