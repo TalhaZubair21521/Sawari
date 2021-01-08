@@ -13,6 +13,17 @@ exports.is_Individual_Room_Already_Exist = async (user1, user2) => {
         return false;
     }
 };
+exports.GetRoomDetails = async (req, res) => {
+    try {
+        const userId = req.query.userId;
+        const otherUserId = req.query.otherUserId;
+        const response = await this.is_Individual_Room_Already_Exist(userId, otherUserId);
+        res.status(200).json({ type: "success", result: response });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ type: "failure", result: "Server Not Responding" });
+    }
+}
 
 exports.Create_Individual_Room = async (user1, user2) => {
     try {

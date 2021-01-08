@@ -16,4 +16,5 @@ router.get("/oAuthGoogle", userControllers.OauthGoogle);
 router.get("/oAuthFacebook", userControllers.OauthFacebook);
 router.put("/updateProfile", authenticator.athenticate, imageMiddleware.upload.single("image"), userControllers.UpdateProfile);
 
+
 exports.routes = router;

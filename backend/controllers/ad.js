@@ -160,10 +160,10 @@ exports.FilterAds = async (req, res) => {
 			const column = await SortHelpers.GetKey(sortBy.column);
 			const sort = await SortHelpers.GetSortValue(sortBy.sort);
 			// console.log(column, sort);
-			ads = await Ad.find(completeFilter).sort([[column, sort]]);
+			ads = await Ad.find(completeFilter).populate('user', 'name').sort([[column, sort]]);
 		} else {
 			// console.log("No Sort By");
-			ads = await Ad.find(completeFilter); // .sort("price", -1).limit(20);
+			ads = await Ad.find(completeFilter).populate('user', 'name'); // .sort("price", -1).limit(20);
 		}
 		//Query Result
 

@@ -162,10 +162,10 @@ exports.GetFilteredRents = async (req, res) => {
             const sort = await SortHelpers.GetSortValue(sortBy.sort);
             // console.log(column, sort);
 
-            rents = await Rent.find(completeFilter).sort([[column, sort]]);
+            rents = await Rent.find(completeFilter).populate('user', 'name').sort([[column, sort]]);
         } else {
             // console.log("No Sort By");
-            rents = await Rent.find(completeFilter); // .sort("price", -1).limit(20);
+            rents = await Rent.find(completeFilter).populate('user', 'name'); // .sort("price", -1).limit(20);
         }
         //Query Result
 

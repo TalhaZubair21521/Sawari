@@ -9,7 +9,6 @@ module.exports = (io) => {
     io.use(socketMiddlewares.getUserDetails);
     io.on('connection', async (socket) => {
         setInterval(() => {
-            console.log()
             io.to(socket.id).emit("sda", {});
         }, 4000);
         await connectionController.createConnection(socket.userDetails._id, socket.id);
@@ -36,6 +35,50 @@ module.exports = (io) => {
                         // Message Saved
                         const messageSaved = await roomController.Save_Message(data.message.author, roomId, data.message.text);
                         console.log("Message Saved", messageSaved);
+                        if (messageSaved) {
+                            // Get Connection Details of Sender and Reciever
+                            let recieverId = null;
+                            let senderId = null;
+                            if (roomDetails.users[0] == data.message.author) {
+                                recieverId = roomDetails.users[1];
+                                senderId = roomDetails.users[0];
+                            } else {
+                                recieverId = roomDetails.users[0];
+                                senderId = roomDetails.users[1];
+                            }
+                            const sender = await connectionController.getConnection(senderId);
+                            const reciever = await connectionController.getConnection(recieverId);
+                            console.log("sender :", sender);
+                            console.log("reciever :", reciever);
+                            // If has reciever connection, emit message, else send notification  
+                            // Send Message to Reciever
+                            // reciever
+                            if (reciever == null) {
+                                console.log("User Not Connected with socket");
+                            } else {
+                                console.log("User have an Socket")
+                                console.log("Reciever Socket", reciever.socket)
+                                io.to(reciever.socket).emit("messageRecieved", { received: true, message: messageSaved });
+                            }
+                            // sender
+                            console.log("Sender Socket  ", sender.socket)
+                            io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
+                        } else {
+                            console.log("Reached Here");
+                            io.to(sender.socket).emit("messageSentAck", { sent: false, message: messageSaved });
+                        }
+                    }
+
+                } else {
+                    // Room ID Exist
+                    const roomId = data.message.room;
+                    const roomDetails = await roomController.Get_Room(roomId);
+                    console.log("Room", roomDetails)
+                    // Message Saved
+                    const messageSaved = await roomController.Save_Message(data.message.author, data.message.room, data.message.text);
+                    console.log("Message Saved", messageSaved);
+
+                    if (messageSaved) {
                         // Get Connection Details of Sender and Reciever
                         let recieverId = null;
                         let senderId = null;
@@ -63,43 +106,10 @@ module.exports = (io) => {
                         // sender
                         console.log("Sender Socket  ", sender.socket)
                         io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
-                    }
-
-                } else {
-                    // Room ID Exist
-                    const roomId = data.message.room;
-                    const roomDetails = await roomController.Get_Room(roomId);
-                    console.log("Room", roomDetails)
-                    // Message Saved
-                    const messageSaved = await roomController.Save_Message(data.message.author, data.message.room, data.message.text);
-                    console.log("Message Saved", messageSaved);
-                    // Get Connection Details of Sender and Reciever
-                    let recieverId = null;
-                    let senderId = null;
-                    if (roomDetails.users[0] == data.message.author) {
-                        recieverId = roomDetails.users[1];
-                        senderId = roomDetails.users[0];
                     } else {
-                        recieverId = roomDetails.users[0];
-                        senderId = roomDetails.users[1];
+                        console.log("Reached Here");
+                        io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
                     }
-                    const sender = await connectionController.getConnection(senderId);
-                    const reciever = await connectionController.getConnection(recieverId);
-                    console.log("sender :", sender);
-                    console.log("reciever :", reciever);
-                    // If has reciever connection, emit message, else send notification  
-                    // Send Message to Reciever
-                    // reciever
-                    if (reciever == null) {
-                        console.log("User Not Connected with socket");
-                    } else {
-                        console.log("User have an Socket")
-                        console.log("Reciever Socket", reciever.socket)
-                        io.to(reciever.socket).emit("messageRecieved", { received: true, message: messageSaved });
-                    }
-                    // sender
-                    console.log("Sender Socket  ", sender.socket)
-                    io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
                 }
             }
             /*

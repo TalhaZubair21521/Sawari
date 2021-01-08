@@ -209,8 +209,7 @@ exports.Liked = async (req, res) => {
     try {
         const userId = req.query.userId;
         const postId = req.query.postId;
-        console.log(userId, postId);
-        const post = await Post.findOne({ likes: userId });
+        const post = await Post.findOne({ _id: postId, likes: userId });
         if (post) {
             res.status(200).json({ "type": "success", "result": "Your Already Liked the Post" });
         } else {
@@ -219,6 +218,7 @@ exports.Liked = async (req, res) => {
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 return;
             }
+            console.log(response);
             res.status(200).json({ "type": "success", "result": "Post Liked Successfully" });
         }
 
