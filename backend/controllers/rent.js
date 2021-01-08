@@ -5,6 +5,7 @@ const Ranger = require("./functions/rangeFilter");
 const Haversine = require("./functions/HaversineFormula");
 const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
+const SortHelpers = require("./functions/SortFunctions");
 
 exports.InsertRent = async (req, res) => {
     try {

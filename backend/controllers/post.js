@@ -218,7 +218,7 @@ exports.Liked = async (req, res) => {
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 return;
             }
-            console.log(response);
+            // console.log(response);
             res.status(200).json({ "type": "success", "result": "Post Liked Successfully" });
         }
 
