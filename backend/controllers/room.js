@@ -74,7 +74,8 @@ exports.Add_User_To_Room = async (roomID, userID) => {
 exports.Get_Rooms = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rooms = await Room.find({ users: userId }).populate('users', 'name image');
+        const rooms = await Room.find({ users: userId }).populate('users', 'name image').lean({ virtuals: true });
+        await rooms[0].lastMessage;
         res.status(200).json({ "type": "success", "result": rooms });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });

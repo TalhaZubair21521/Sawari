@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const MongooseLeanVirtuals = require('mongoose-lean-virtuals');
 const Schema = mongoose.Schema;
 
 const RoomSchema = new Schema(
@@ -14,4 +14,11 @@ const RoomSchema = new Schema(
     { toObject: { virtuals: true } }
 );
 
+RoomSchema.virtual('lastMessage').get(async function () {
+    const result = await mongoose.model('message').find({ room: this._id }, 'createdAt text').sort([["createdAt", -1]]).limit(1);
+    this.lastMessage = result[0];
+    return this;
+});
+
+RoomSchema.plugin(MongooseLeanVirtuals);
 module.exports = mongoose.model("room", RoomSchema);

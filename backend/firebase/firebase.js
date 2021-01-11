@@ -5,7 +5,6 @@ exports.SendNotification = async (title, subTitle, fcmToken) => {
         const FETCH_URL = "https://fcm.googleapis.com/fcm/send";
         require("dotenv").config();
         const FIREBASE_APP_KEY = process.env.FIREBASE_APP_KEY;
-
         const message = {
             registration_ids: [fcmToken],
             notification: {
@@ -25,8 +24,8 @@ exports.SendNotification = async (title, subTitle, fcmToken) => {
             headers: { "Content-Type": "application/json", Authorization: FIREBASE_APP_KEY, },
             body: JSON.stringify(message)
         });
-
         response = await response.json();
+        console.log(response);
         return response;
     } catch (error) {
         console.log(error);

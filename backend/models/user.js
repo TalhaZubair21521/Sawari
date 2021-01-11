@@ -13,6 +13,7 @@ const UserSchema = new Schema({
     password: { type: String, required: true },
     provider: { type: Object, default: null },
     forgetKey: { type: String, required: true },
+    fcmToken: { type: String }
 },
     { timestamps: true }
 );
