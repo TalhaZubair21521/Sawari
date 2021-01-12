@@ -9,7 +9,7 @@ const User = require("../models/user");
 
 exports.GetAd = async (req, res) => {
 	try {
-		const ad = await Ad.findById(req.query.Id)
+		const ad = await Ad.findById(req.query.Id).populate('user', 'name');;
 		res.status(200).json({ "type": "success", "result": ad });
 	} catch (error) {
 		console.log(error);

@@ -46,6 +46,8 @@ exports.Signin = async (req, res) => {
             const isEqual = await User.isPasswordEqual(req.query.password, user.password);
             if (isEqual) {
                 const token = JWT.sign({ username: user.name }, JWT_SECRET_KEY);
+                // console.log(req.query.fcmToken);
+                await User.findByIdAndUpdate(user._id, { $set: { fcmToken: req.query.fcmToken } });
                 // console.log(user);
                 res.status(200).json({
                     type: "success", result: "User Login Successfully", token: token,

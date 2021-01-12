@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 exports.AddPost = async (req, res) => {
     try {
         const post = new Post(req.body);
-        const user = await User.findById(post.user);
+        const user = await User.findById(post.user).populate('user', 'name');;
         if (!user) {
             await Remover.RemoveImages(req.files);
             res.status(500).json({ "type": "failure", "result": "User ID Not Exist" });

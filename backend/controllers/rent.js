@@ -9,7 +9,7 @@ const SortHelpers = require("./functions/SortFunctions");
 
 exports.GetRent = async (req, res) => {
     try {
-        const rent = await Rent.findById(req.query.Id)
+        const rent = await Rent.findById(req.query.Id).populate('user', 'name');
         res.status(200).json({ "type": "success", "result": rent });
     } catch (error) {
         console.log(error);
