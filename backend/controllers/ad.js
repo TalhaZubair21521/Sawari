@@ -7,6 +7,16 @@ const Haversine = require("./functions/HaversineFormula");
 const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
 
+exports.GetAd = async (req, res) => {
+	try {
+		const ad = await Ad.findById(req.query.Id)
+		res.status(200).json({ "type": "success", "result": ad });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+	}
+}
+
 exports.InsertAd = async (req, res) => {
 	try {
 		const errors = validationResult(req);

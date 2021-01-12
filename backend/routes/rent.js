@@ -16,5 +16,6 @@ router.get("/getRentByUser", authenticator.athenticate, rentControllers.GetRents
 router.get("/getAllRent", authenticator.athenticate, rentControllers.GetAllRents);
 router.post("/getFilteredRent", authenticator.athenticate, rentControllers.GetFilteredRents);
 router.put("/changeRentOutStatus", authenticator.athenticate, rentControllers.ChangeRentOutedStatus);
+router.get("/getRent", authenticator.athenticate, rentControllers.GetRent);
 
 exports.routes = router;

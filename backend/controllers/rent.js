@@ -7,6 +7,16 @@ const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
 const SortHelpers = require("./functions/SortFunctions");
 
+exports.GetRent = async (req, res) => {
+    try {
+        const rent = await Rent.findById(req.query.Id)
+        res.status(200).json({ "type": "success", "result": rent });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
 exports.InsertRent = async (req, res) => {
     try {
         const errors = validationResult(req);

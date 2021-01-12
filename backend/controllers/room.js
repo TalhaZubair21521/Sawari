@@ -13,6 +13,7 @@ exports.is_Individual_Room_Already_Exist = async (user1, user2) => {
         return false;
     }
 };
+
 exports.GetRoomDetails = async (req, res) => {
     try {
         const userId = req.query.userId;
@@ -74,11 +75,13 @@ exports.Add_User_To_Room = async (roomID, userID) => {
 exports.Get_Rooms = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rooms = await Room.find({ users: userId }).populate('users', 'name image').lean({ virtuals: true });
+        const rooms = await Room.find({ users: userId }).populate('users', 'name image').sort([["lastMessage.createdAt", -1]]).lean({ virtuals: true });
         await rooms[0].lastMessage;
+        rooms.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
         res.status(200).json({ "type": "success", "result": rooms });
     } catch (error) {
-        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+        console.log(error)
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding", error: error });
     }
 };
 
