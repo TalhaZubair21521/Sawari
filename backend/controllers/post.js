@@ -35,6 +35,16 @@ exports.AddPost = async (req, res) => {
     }
 }
 
+exports.GetPost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.query.postId);
+        res.status(200).json({ type: "success", result: post });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ type: "failure", result: "Server nNt Responding" })
+    }
+}
+
 exports.GetPosts = async (req, res) => {
     try {
         const userId = req.query.userId;

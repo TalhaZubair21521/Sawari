@@ -11,7 +11,7 @@ require("dotenv").config();
 require("./database/connect");
 
 app.use(cors());
-const port = process.env.PORT || 9999;
+const port = process.env.PORT || 3000;
 const host = process.env.HOST;
 
 app.use(morgan('dev'));
