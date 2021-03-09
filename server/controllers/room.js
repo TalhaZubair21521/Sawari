@@ -76,8 +76,10 @@ exports.Get_Rooms = async (req, res) => {
     try {
         const userId = req.query.userId;
         const rooms = await Room.find({ users: userId }).populate('users', 'name image').sort([["lastMessage.createdAt", -1]]).lean({ virtuals: true });
-        await rooms[0].lastMessage;
-        rooms.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
+        if (rooms.length > 0) {
+            await rooms[0].lastMessage;
+            rooms.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
+        }
         res.status(200).json({ "type": "success", "result": rooms });
     } catch (error) {
         console.log(error)

@@ -17,5 +17,7 @@ router.get("/getAllRent", authenticator.athenticate, rentControllers.GetAllRents
 router.post("/getFilteredRent", authenticator.athenticate, rentControllers.GetFilteredRents);
 router.put("/changeRentOutStatus", authenticator.athenticate, rentControllers.ChangeRentOutedStatus);
 router.get("/getRent", authenticator.athenticate, rentControllers.GetRent);
+router.post("/makeFavourite", authenticator.athenticate, rentControllers.MakeFavourite);
+router.post("/removeFavourite", authenticator.athenticate, rentControllers.RemoveFavourite);
 
 exports.routes = router;

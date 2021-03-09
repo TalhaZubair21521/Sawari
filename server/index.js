@@ -48,4 +48,4 @@ myServer = app.listen(port, host, () => {
 });
 
 io = SocketIO(myServer);
-socketConnect(io); 
+socketConnect(io);

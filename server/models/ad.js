@@ -32,6 +32,8 @@ const AdSchema = new Schema({
     longitude: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     user: { type: Schema.Types.ObjectId, ref: "user", required: true },
+
+    favourites: [{ type: Schema.Types.ObjectId, ref: "user", required: true }],
 }, { timestamps: true }
 );
 

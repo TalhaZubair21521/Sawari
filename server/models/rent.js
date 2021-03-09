@@ -32,7 +32,9 @@ const RentSchema = new Schema({
     longitude: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     user: { type: Schema.Types.ObjectId, ref: "user", required: true },
-    rentType: { type: String, required: true, trim: true }
+    rentType: { type: String, required: true, trim: true },
+
+    favourites: [{ type: Schema.Types.ObjectId, ref: "user", required: true }],
 }, { timestamps: true }
 );
 

@@ -16,7 +16,7 @@ const PostSchema = new Schema(
         text: { type: String, default: "" },
         media: [FileSchema],
         user: { type: Schema.Types.ObjectId, ref: "user", required: true },
-        likes: [{ type: Schema.Types.ObjectId, ref: "user", required: true }]
+        likes: [{ type: Schema.Types.ObjectId, ref: "user", required: true }],
     },
     { timestamps: true }
 );

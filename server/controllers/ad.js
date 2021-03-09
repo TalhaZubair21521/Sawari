@@ -253,3 +253,42 @@ exports.UpdateAd = async (req, res) => {
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
 	}
 }
+
+exports.MakeFavourite = async (req, res) => {
+	try {
+		const userId = req.query.userId;
+		const adId = req.query.adId;
+		const ad = await Ad.findOne({ _id: adId, favourites: userId });
+		if (ad) {
+			res.status(200).json({ "type": "success", "result": "Your Already Favourited this Ad" });
+		} else {
+			const response = await Ad.findByIdAndUpdate(adId, { $push: { favourites: [userId] } })
+			if (!response) {
+				res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+				return;
+			}
+			// console.log(response);
+			res.status(200).json({ "type": "success", "result": "Ad Favourited Successfully" });
+		}
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ "type": "failure", "result": "Server Not Responding" + error });
+	}
+}
+
+exports.RemoveFavourite = async (req, res) => {
+	try {
+		const userId = req.query.userId;
+		const adId = req.query.adId;
+		const response = await Ad.findByIdAndUpdate(adId, { $pullAll: { favourites: [userId] } })
+		if (!response) {
+			console.log(response);
+			res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+			return;
+		}
+		res.status(200).json({ "type": "success", "result": "Ad UnFavourited Successfully" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+	}
+}
