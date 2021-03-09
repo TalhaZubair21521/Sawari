@@ -85,6 +85,7 @@ exports.GetFilteredRents = async (req, res) => {
         req.body.sold = false;
         let filter = req.body.filter;
         let sortBy = req.body.sortBy;
+        let userId = req.body.user;
         let rangeFilter = {};
 
         //Getting Values of Min and Max
@@ -173,10 +174,19 @@ exports.GetFilteredRents = async (req, res) => {
             const sort = await SortHelpers.GetSortValue(sortBy.sort);
             // console.log(column, sort);
 
-            rents = await Rent.find(completeFilter).populate('user', 'name').sort([[column, sort]]);
+            rents = await Rent.aggregate([
+                { $match: completeFilter },
+                { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+                { $addFields: { isfavourite: { $in: [mongoose.Types.ObjectId(userId), "$favourites"] } } },
+                { $sort: { [column]: sort } }
+            ]);
         } else {
             // console.log("No Sort By");
-            rents = await Rent.find(completeFilter).populate('user', 'name'); // .sort("price", -1).limit(20);
+            rents = await Rent.aggregate([
+                { $match: completeFilter },
+                { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+                { $addFields: { isfavourite: { $in: [mongoose.Types.ObjectId(userId), "$favourites"] } } },
+            ]); // .sort("price", -1).limit(20);
         }
         //Query Result
 
@@ -259,8 +269,8 @@ exports.UpdateRent = async (req, res) => {
 exports.MakeFavourite = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rentId = req.query.adId;
-        const rent = await Ad.findOne({ _id: rentId, favourites: userId });
+        const rentId = req.query.rentId;
+        const rent = await Rent.findOne({ _id: rentId, favourites: userId });
         if (rent) {
             res.status(200).json({ "type": "success", "result": "Your Already Favourited this Ad" });
         } else {
@@ -281,7 +291,7 @@ exports.MakeFavourite = async (req, res) => {
 exports.RemoveFavourite = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rentId = req.query.adId;
+        const rentId = req.query.rentId;
         const response = await Rent.findByIdAndUpdate(rentId, { $pullAll: { favourites: [userId] } })
         if (!response) {
             console.log(response);
@@ -289,6 +299,17 @@ exports.RemoveFavourite = async (req, res) => {
             return;
         }
         res.status(200).json({ "type": "success", "result": "Rent UnFavourited Successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+exports.GetFavouriteRents = async (req, res) => {
+    try {
+        const userId = req.query.userId;
+        const rents = await Rent.find({ favourites: userId }, "-favourites");
+        res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         console.log(error);
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });

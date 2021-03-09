@@ -3,14 +3,14 @@ exports.RangeFilter = async (minValue, maxValue) => {
     if ((typeof minValue === 'undefined') && (typeof maxValue === 'undefined')) {
         return null;
     } else if (!(typeof minValue === 'undefined') && !(typeof maxValue === 'undefined')) {
-        filter.range = { $gte: minValue, $lte: maxValue };
+        filter.range = { $gte: parseInt(minValue), $lte: parseInt(maxValue) };
         return filter;
     } else {
         if (typeof minValue === 'undefined') {
-            filter.range = { $lte: maxValue };
+            filter.range = { $lte: parseInt(maxValue) };
             return filter;
         } else {
-            filter.range = { $gte: minValue };
+            filter.range = { $gte: parseInt(minValue) };
             return filter;
         }
     }

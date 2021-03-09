@@ -19,5 +19,6 @@ router.put("/changeSoldStatus", authenticator.athenticate, adControllers.ChangeS
 router.get("/getAd", authenticator.athenticate, adControllers.GetAd);
 router.post("/makeFavourite", authenticator.athenticate, adControllers.MakeFavourite);
 router.post("/removeFavourite", authenticator.athenticate, adControllers.RemoveFavourite);
+router.get("/getFavouritedAds", authenticator.athenticate, adControllers.GetFavouriteAds);
 
 exports.routes = router;

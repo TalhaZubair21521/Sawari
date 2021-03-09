@@ -6,6 +6,7 @@ const SortHelpers = require("./functions/SortFunctions");
 const Haversine = require("./functions/HaversineFormula");
 const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 exports.GetAd = async (req, res) => {
 	try {
@@ -83,6 +84,7 @@ exports.FilterAds = async (req, res) => {
 		req.body.sold = false;
 		let filter = req.body.filter;
 		let sortBy = req.body.sortBy;
+		let userId = req.body.user;
 		let rangeFilter = {};
 
 		//Getting Values of Min and Max
@@ -169,13 +171,25 @@ exports.FilterAds = async (req, res) => {
 			// console.log("Yes Sort By");
 			const column = await SortHelpers.GetKey(sortBy.column);
 			const sort = await SortHelpers.GetSortValue(sortBy.sort);
+
+			ads = await Ad.aggregate([
+				{ $match: completeFilter },
+				{ $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+				{ $addFields: { isfavourite: { $in: [mongoose.Types.ObjectId(userId), "$favourites"] } } },
+				{ $sort: { [column]: sort } }
+			]);
 			// console.log(column, sort);
-			ads = await Ad.find(completeFilter).populate('user', 'name').sort([[column, sort]]);
+			// ads = await Ad.find(completeFilter).populate('user', 'name').sort([[column, sort]]);
 		} else {
+			ads = await Ad.aggregate([
+				{ $match: completeFilter },
+				{ $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+				{ $addFields: { isfavourite: { $in: [mongoose.Types.ObjectId(userId), "$favourites"] } } },
+			]);
 			// console.log("No Sort By");
-			ads = await Ad.find(completeFilter).populate('user', 'name'); // .sort("price", -1).limit(20);
+			// ads = await Ad.find(completeFilter).populate('user', 'name'); // .sort("price", -1).limit(20);
 		}
-		//Query Result
+		//Query Result 
 
 		// console.log("Ads :", ads.length);
 
@@ -287,6 +301,18 @@ exports.RemoveFavourite = async (req, res) => {
 			return;
 		}
 		res.status(200).json({ "type": "success", "result": "Ad UnFavourited Successfully" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+	}
+}
+
+
+exports.GetFavouriteAds = async (req, res) => {
+	try {
+		const userId = req.query.userId;
+		const ads = await Ad.find({ favourites: userId }, "-favourites");
+		res.status(200).json({ "type": "success", "result": ads });
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
