@@ -308,7 +308,11 @@ exports.RemoveFavourite = async (req, res) => {
 exports.GetFavouriteRents = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rents = await Rent.find({ favourites: userId }, "-favourites");
+        const rents = await Rent.aggregate([
+            { $match: { favourites: mongoose.Types.ObjectId(userId) } },
+            { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+            { $addFields: { isfavourite: true } },
+        ]);
         res.status(200).json({ "type": "success", "result": rents });
     } catch (error) {
         console.log(error);

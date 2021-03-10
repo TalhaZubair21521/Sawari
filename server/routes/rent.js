@@ -7,7 +7,7 @@ const rentControllers = require("../controllers/rent");
 const rentImagesMiddleware = require("../middlewares/ImagesMiddleware");
 
 const authenticator = require("../middlewares/authenticator");
-
+ 
 const router = express.Router();
 
 router.post("/insertRent", rentImagesMiddleware.upload.array('images'), authenticator.athenticate, rentHandler.rentHandler, rentControllers.InsertRent);
@@ -17,8 +17,8 @@ router.get("/getAllRent", authenticator.athenticate, rentControllers.GetAllRents
 router.post("/getFilteredRent", authenticator.athenticate, rentControllers.GetFilteredRents);
 router.put("/changeRentOutStatus", authenticator.athenticate, rentControllers.ChangeRentOutedStatus);
 router.get("/getRent", authenticator.athenticate, rentControllers.GetRent);
-router.post("/makeFavourite", authenticator.athenticate, rentControllers.MakeFavourite);
-router.post("/removeFavourite", authenticator.athenticate, rentControllers.RemoveFavourite);
+router.put("/makeFavourite", authenticator.athenticate, rentControllers.MakeFavourite);
+router.put("/removeFavourite", authenticator.athenticate, rentControllers.RemoveFavourite);
 router.get("/getFavouritedRents", authenticator.athenticate, rentControllers.GetFavouriteRents);
 
 exports.routes = router;
