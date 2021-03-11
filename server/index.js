@@ -40,7 +40,7 @@ app.use("/room", room.routes);
 app.use("/test", test.routes);
 
 app.get("/", async (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+    res.send({ "message": "Welcome to Sawario API" });
 });
 
 myServer = app.listen(port, host, () => {

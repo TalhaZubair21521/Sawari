@@ -28,4 +28,10 @@ router.post("/createRoom", async (req, res) => {
     }
 });
 
+router.get("/addTestData", (req, res) => {
+    try {
+
+    } catch (error) { }
+});
+
 exports.routes = router;
