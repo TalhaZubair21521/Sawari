@@ -3,6 +3,7 @@ const Firebase = require("../firebase/firebase");
 const connectionController = require("../controllers/connection");
 const User = require("../models/user");
 const socketMiddlewares = require("./middlewares");
+const notifications = require("../models/notifications");
 
 module.exports = (io) => {
     io.use(socketMiddlewares.isAuthorized);
@@ -103,6 +104,17 @@ module.exports = (io) => {
                         // Send Message to Reciever
                         // reciever
                         if (reciever == null) {
+                            // console.log("Message Id : " + messageSaved._id);
+                            // console.log("User Id : " + Sender_User._id);
+                            // console.log("Room Id : " + roomId);
+                            const object = {
+                                message: messageSaved._id,
+                                user: Sender_User._id,
+                                reciever: recieverId,
+                                room: roomId
+                            }
+                            const notify = await notifications(object);
+                            await notify.save();
                             await Firebase.SendNotification("Message from " + Sender_User.name, data.message.text, fcmTOKEN_User.fcmToken);
                             // console.log("User Not Connected with socket");
                         } else {

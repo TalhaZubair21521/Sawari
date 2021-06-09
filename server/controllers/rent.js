@@ -6,7 +6,7 @@ const Haversine = require("./functions/HaversineFormula");
 const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
 const SortHelpers = require("./functions/SortFunctions");
-
+const mongoose = require("mongoose");
 exports.GetRent = async (req, res) => {
     try {
         const rent = await Rent.findById(req.query.Id).populate('user', 'name');

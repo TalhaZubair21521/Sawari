@@ -26,6 +26,7 @@ const car = require("./routes/car");
 const post = require("./routes/post");
 const room = require("./routes/room");
 const test = require("./routes/tests");
+const notifications = require("./routes/notifications");
 const socketConnect = require("./socket/socket");
 
 app.use('/assets', express.static('assets'));
@@ -38,6 +39,7 @@ app.use("/car", car.routes);
 app.use("/post", post.routes);
 app.use("/room", room.routes);
 app.use("/test", test.routes);
+app.use("/notifications", notifications.routes);
 
 app.get("/", async (req, res) => {
     res.send({ "message": "Welcome to Sawario API" });

@@ -27,6 +27,6 @@ exports.SendNotification = async (title, subTitle, fcmToken) => {
         body: JSON.stringify(message)
     })
     response = await response.json();
-    console.log(response);
+    // console.log(response);
     return response;
 }

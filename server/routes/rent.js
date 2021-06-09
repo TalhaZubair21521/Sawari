@@ -7,7 +7,7 @@ const rentControllers = require("../controllers/rent");
 const rentImagesMiddleware = require("../middlewares/ImagesMiddleware");
 
 const authenticator = require("../middlewares/authenticator");
- 
+
 const router = express.Router();
 
 router.post("/insertRent", rentImagesMiddleware.upload.array('images'), authenticator.athenticate, rentHandler.rentHandler, rentControllers.InsertRent);
