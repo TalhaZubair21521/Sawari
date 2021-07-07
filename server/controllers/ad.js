@@ -26,6 +26,7 @@ exports.InsertAd = async (req, res) => {
 			res.status(400).json({ type: "failure", "result": errors.errors[0].msg });
 			return;
 		} else {
+			console.log(req.body);
 			const ad = new Ad(req.body);
 			ad.sold = false;
 			const user = await User.findById(ad.user);

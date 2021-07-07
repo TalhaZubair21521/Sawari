@@ -7,6 +7,7 @@ const ArrayFunctions = require("./functions/ArrayFunctions");
 const User = require("../models/user");
 const SortHelpers = require("./functions/SortFunctions");
 const mongoose = require("mongoose");
+
 exports.GetRent = async (req, res) => {
     try {
         const rent = await Rent.findById(req.query.Id).populate('user', 'name');
@@ -270,12 +271,14 @@ exports.MakeFavourite = async (req, res) => {
     try {
         const userId = req.query.userId;
         const rentId = req.query.rentId;
+        console.log(userId, rentId);
         const rent = await Rent.findOne({ _id: rentId, favourites: userId });
         if (rent) {
             res.status(200).json({ "type": "success", "result": "Your Already Favourited this Ad" });
         } else {
             const response = await Rent.findByIdAndUpdate(rentId, { $push: { favourites: [userId] } })
             if (!response) {
+                console.log(response);
                 res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
                 return;
             }
@@ -292,6 +295,8 @@ exports.RemoveFavourite = async (req, res) => {
     try {
         const userId = req.query.userId;
         const rentId = req.query.rentId;
+        console.log(userId, rentId);
+
         const response = await Rent.findByIdAndUpdate(rentId, { $pullAll: { favourites: [userId] } })
         if (!response) {
             console.log(response);

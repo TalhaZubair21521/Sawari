@@ -33,7 +33,7 @@ const RentSchema = new Schema({
     description: { type: String, required: true, trim: true },
     user: { type: Schema.Types.ObjectId, ref: "user", required: true },
     rentType: { type: String, required: true, trim: true },
-
+    insurence: { type: Boolean, required: true, trim: true },
     favourites: [{ type: Schema.Types.ObjectId, ref: "user", required: true }],
 }, { timestamps: true }
 );

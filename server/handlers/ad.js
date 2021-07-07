@@ -18,7 +18,7 @@ exports.adHandler = [
     body("gear").notEmpty().withMessage("Gear is Missing"),
     body("engineType").notEmpty().withMessage("Engine Type is Missing"),
     body("engineValue").notEmpty().withMessage("Engine Value is Missing").isNumeric().withMessage("Engine Value must be a Number"),
-    body("city").notEmpty().withMessage("City is Missing"),
+    // body("city").notEmpty().withMessage("City is Missing"),
     body("make").notEmpty().withMessage("Make is Missing"),
     body("model").notEmpty().withMessage("Model is Missing"),
     body("description").notEmpty().withMessage("Description is Missing"),

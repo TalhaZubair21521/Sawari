@@ -27,4 +27,5 @@ exports.rentHandler = [
     body("user").notEmpty().withMessage("User is Missing"),
     body("year").notEmpty().withMessage("Year is Missing").isNumeric().withMessage("Year must be a Number"),
     body("seats").notEmpty().withMessage("Seats is Missing").isNumeric().withMessage("Seats must be a Number"),
+    body("insurence").notEmpty().withMessage("Insurence is Missing")
 ];
