@@ -1,5 +1,6 @@
 const Room = require("../models/room");
 const Message = require("../models/message");
+const roomController = require("../controllers/room");
 
 exports.is_Individual_Room_Already_Exist = async (user1, user2) => {
     try {
@@ -39,7 +40,10 @@ exports.Create_Individual_Room = async (user1, user2) => {
 exports.is_Group_Room_Already_Exist = async (groupName) => {
     try {
         const room = await Room.find({ name: groupName });
-        console.log(room);
+        if (room.length === 0) {
+            return false;
+        }
+        return true;
     } catch (error) {
         return false;
     }
@@ -54,10 +58,20 @@ exports.is_User_In_Room_Already_Exist = async (userID) => {
     }
 };
 
-exports.Create_Group_Room = async (userID, groupName) => {
+exports.Create_Group_Room = async (groupName) => {
     try {
-        const room = new Room({ users: [userID], group: true, name: groupName });
-        console.log(room);
+        const room = new Room({ users: [], group: true, name: groupName });
+        await room.save();
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+exports.Get_Group_Room_Detail = async () => {
+    try {
+        const room = await Room.find({ name: "global" });
+        return room[0];
     } catch (error) {
         return false;
     }
@@ -66,7 +80,6 @@ exports.Create_Group_Room = async (userID, groupName) => {
 exports.Add_User_To_Room = async (roomID, userID) => {
     try {
         const response = await Room.findByIdAndUpdate(roomID, { $push: { users: [userID] } });
-        console.log(response);
     } catch (error) {
         return false;
     }
@@ -123,6 +136,28 @@ exports.JoinGroup = async (req, res) => {
     try {
 
     } catch (error) {
+        res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
+    }
+}
+
+
+exports.GetGroupMessages = async (req, res) => {
+    try {
+        const room = await roomController.Get_Group_Room_Detail();
+        // const users = ["60c04b67e614fa0808ff10cc", "60c05166e614fa0808ff10d0", "60c1e664ae82263a508ae263", "60cb209f647ea03ec051bee0", "60e6913a3ba66f1e1c9468e9", "60e69178d5fc493598f92b48"];
+        // const response = await Room.findByIdAndUpdate(room._id, { $push: { users: users } });
+        // for (let i = 0; i < 20; i++) {
+        //     const randomNumber = Math.floor(Math.random() * 6);
+        //     const userId = users[randomNumber];
+        //     const message = new Message({ author: userId, room: room._id, text: "New Message", attachments: [] });
+        //     await message.save();
+        // }
+        // const message = new Message({ author: room.users[0], room: room._id, text: "New Message", attachments: [] });
+        // await message.save();
+        const messages = await Message.find({ room: room._id }, '-attachments -read -updatedAt -__v').populate("author", "_id image").sort([["createdAt", -1]]);
+        res.status(200).json({ "type": "success", "result": messages });
+    } catch (error) {
+        console.log(error)
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
     }
 }

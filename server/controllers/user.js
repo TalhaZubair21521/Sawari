@@ -5,6 +5,7 @@ require("dotenv").config();
 const Remover = require("./functions/imageResizer");
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const fs = require("fs");
+const roomController = require("./room");
 
 exports.Signup = async (req, res) => {
     try {
@@ -22,12 +23,14 @@ exports.Signup = async (req, res) => {
                 res.status(400).json({ "type": "failure", "result": "Email already Exist. Choose a Different Email" });
                 return;
             }
-            user.save(async (err) => {
+            user.save(async (err, data) => {
                 if (err && err.code === 11000) {
                     const keyName = Object.keys(err.keyValue)[0];
                     const attributeName = keyName.charAt(0).toUpperCase() + keyName.slice(1);
                     res.status(400).json({ "type": "failure", "result": attributeName + " already Exist. Choose a Different " + attributeName });
                 } else {
+                    const group = await roomController.Get_Group_Room_Detail();
+                    const response = await roomController.Add_User_To_Room(group._id, data._id);
                     res.status(200).json({ "type": "success", "result": "User Registered Successfully" });
                 }
             });

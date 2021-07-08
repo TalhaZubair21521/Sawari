@@ -10,5 +10,8 @@ router.post("/joinGroup", authenticator.athenticate, roomControllers.JoinGroup);
 router.get("/getRooms", roomControllers.Get_Rooms);
 router.get("/getRoom", authenticator.athenticate, roomControllers.GetMessagesOfRoom);
 router.get("/checkRoom", authenticator.athenticate, roomControllers.GetRoomDetails);
+router.get("/getGroupMessages",
+    // authenticator.athenticate,
+    roomControllers.GetGroupMessages);
 
 exports.routes = router;

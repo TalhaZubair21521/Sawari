@@ -6,6 +6,7 @@ const path = require("path");
 const compression = require('compression');
 const morgan = require('morgan');
 const SocketIO = require('socket.io');
+const roomController = require("./controllers/room");
 
 require("dotenv").config();
 require("./database/connect");
@@ -48,6 +49,15 @@ app.get("/", async (req, res) => {
 myServer = app.listen(port, host, () => {
     console.log("Sawario Server running at http://" + host + ":" + port);
 });
+
+const createGroup = async () => {
+    const response = await roomController.is_Group_Room_Already_Exist("global");
+    if (!response) {
+        await roomController.Create_Group_Room("global");
+    }
+}
+
+createGroup();
 
 io = SocketIO(myServer);
 socketConnect(io);
