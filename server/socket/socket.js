@@ -2,6 +2,7 @@ const roomController = require("../controllers/room");
 const Firebase = require("../firebase/firebase");
 const connectionController = require("../controllers/connection");
 const User = require("../models/user");
+const Message = require("../models/message");
 const socketMiddlewares = require("./middlewares");
 const notifications = require("../models/notifications");
 
@@ -16,6 +17,37 @@ module.exports = (io) => {
         socket.on("sendMessage", async (data) => {
             // console.log(data);
             if (data.room.group) {
+                // console.log("Data from User", data);
+                //Gett the room details
+                const room = await roomController.Get_Group_Room_Detail();
+                // console.log("Room Details", room);
+                //Save the message in database
+                const message = new Message({ ...data.message, room: room._id });
+                // console.log("Message", message);
+                let messageSaved = await message.save();
+                messageSaved = await Message.findById(messageSaved._id).populate("author");
+                //send the acknowledgement to user
+                const senderId = message.author;
+                const sender = await connectionController.getConnection(senderId);
+                // console.log("Connection", sender);
+                // if (sender) {
+                io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved, group: true });
+                // }
+                //send notification to all group members
+                let users = room.users;
+                users.map(async (item) => {
+                    if (item + "" === "" + message.author) {
+                        // const reciever = await connectionController.getConnection(item);
+                        // io.to(reciever.socket).emit("messageRecieved", { received: true, message: messageSaved, group: true });
+                    } else {
+                        const reciever = await connectionController.getConnection(item);
+                        if (reciever) {
+                            io.to(reciever.socket).emit("messageRecieved", { received: true, message: messageSaved, group: true });
+                            const user = await User.findById(item);
+                            await Firebase.SendNotification("Message from " + messageSaved.author.name, messageSaved.text, user.fcmToken);
+                        }
+                    }
+                });
             } else {
                 // Inside Individual Chat
                 if (data.message.room === null) {

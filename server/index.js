@@ -15,7 +15,7 @@ app.use(cors());
 const port = process.env.PORT || 5000;
 const host = process.env.HOST;
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(compression())
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));

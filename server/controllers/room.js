@@ -88,7 +88,7 @@ exports.Add_User_To_Room = async (roomID, userID) => {
 exports.Get_Rooms = async (req, res) => {
     try {
         const userId = req.query.userId;
-        const rooms = await Room.find({ users: userId }).populate('users', 'name image').sort([["lastMessage.createdAt", -1]]).lean({ virtuals: true });
+        const rooms = await Room.find({ users: userId, group: false }).populate('users', 'name image').sort([["lastMessage.createdAt", -1]]).lean({ virtuals: true });
         if (rooms.length > 0) {
             await rooms[0].lastMessage;
             rooms.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt);
