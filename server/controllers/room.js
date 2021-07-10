@@ -39,7 +39,7 @@ exports.Create_Individual_Room = async (user1, user2) => {
 
 exports.is_Group_Room_Already_Exist = async (groupName) => {
     try {
-        const room = await Room.find({ name: groupName });
+        const room = await Room.find({ name: groupName, group: false });
         if (room.length === 0) {
             return false;
         }
@@ -116,7 +116,7 @@ exports.Save_Message = async (userID, roomID, text) => {
 exports.GetMessagesOfRoom = async (req, res) => {
     try {
         const roomID = req.query.roomId;
-        const messages = await Message.find({ room: roomID }).populate("author", 'image').sort([["createdAt", -1]]);
+        const messages = await Message.find({ room: roomID, group: false }).populate("author", 'image').sort([["createdAt", -1]]);
         res.status(200).json({ "type": "success", "result": messages });
     } catch (error) {
         res.status(500).json({ "type": "failure", "result": "Server Not Responding" });
@@ -125,7 +125,7 @@ exports.GetMessagesOfRoom = async (req, res) => {
 
 exports.Get_Room = async (roomID) => {
     try {
-        const room = await Room.findById(roomID);
+        const room = await Room.find(roomID);
         return room;
     } catch (error) {
         return false;

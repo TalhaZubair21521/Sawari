@@ -52,7 +52,7 @@ module.exports = (io) => {
                 // Inside Individual Chat
                 if (data.message.room === null) {
                     // Room Does Not Exists, Create Individual Room
-                    const isExist = await roomController.is_Group_Room_Already_Exist(data.room.users[0], data.room.users[1]);
+                    const isExist = await roomController.is_Individual_Room_Already_Exist(data.room.users[0], data.room.users[1]);
                     if (isExist === null) {
                         // console.log("Room Not Exist");
                     } else {
@@ -156,7 +156,9 @@ module.exports = (io) => {
                         }
                         // sender
                         // console.log("Sender Socket  ", sender.socket)
-                        io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
+                        if (sender) {
+                            io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
+                        }
                     } else {
                         // console.log("Reached Here");
                         io.to(sender.socket).emit("messageSentAck", { sent: true, message: messageSaved });
