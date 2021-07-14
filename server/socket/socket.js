@@ -50,6 +50,7 @@ module.exports = (io) => {
                 });
             } else {
                 // Inside Individual Chat
+                console.log(data);
                 if (data.message.room === null) {
                     // Room Does Not Exists, Create Individual Room
                     const isExist = await roomController.is_Individual_Room_Already_Exist(data.room.users[0], data.room.users[1]);
@@ -64,7 +65,7 @@ module.exports = (io) => {
                         const roomId = response._id
                         // Other Thing is Same as Message Sent
                         const roomDetails = await roomController.Get_Room(roomId);
-                        // console.log("Room", roomDetails)
+                        console.log("Room", roomDetails)
                         // Message Saved
                         const messageSaved = await roomController.Save_Message(data.message.author, roomId, data.message.text);
                         // console.log("Message Saved", messageSaved);

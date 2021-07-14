@@ -6,7 +6,7 @@ const carControllers = require("../controllers/car");
 
 const router = express.Router();
 
-router.post("/addCars", carControllers.AddCars);
+router.get("/addCars", carControllers.AddCars);
 router.get("/getMakes", carControllers.GetMakes);
 router.get("/getModelsByMake", carControllers.GetModelsByMake);
 
